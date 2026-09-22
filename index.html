@@ -16,7 +16,7 @@
     </div>
 
     <div class="app-shell">
-      <aside class="sidebar" id="sidebar">
+      <aside class="sidebar" id="sidebar" data-tour="navigation">
         <div class="brand" aria-label="MyWorkspace">
           <div class="brand-mark"><span></span><span></span><span></span></div>
           <div><strong>MyWorkspace</strong><small>рабочий центр</small></div>
@@ -33,24 +33,25 @@
           <span class="pulse-dot"></span>
           <div><strong>Всё работает локально</strong><p>Данные остаются на этом устройстве</p></div>
         </div>
-        <div class="sidebar-footer">v1.0 · личное пространство</div>
+        <button class="tour-restart" id="restartTour"><span>?</span><div><strong>Обучение</strong><small>Повторить подсказки</small></div></button>
+        <div class="sidebar-footer">v1.1 · личное пространство</div>
       </aside>
 
       <main class="workspace">
         <header class="topbar">
           <button class="mobile-menu" id="mobileMenu" aria-label="Открыть меню">☰</button>
           <div class="breadcrumbs"><span>Рабочее пространство</span><b>/</b><strong id="currentSection">Главная</strong></div>
-          <div class="today" id="today"></div>
+          <div class="topbar-actions"><div class="today" id="today"></div><button class="user-chip" id="editProfile" aria-label="Изменить имя"><span id="userInitial">Я</span><strong id="userName">Профиль</strong></button></div>
         </header>
 
         <section class="view is-active" id="view-home">
           <div class="page-heading home-heading">
-            <div><p class="eyebrow">ДОБРО ПОЖАЛОВАТЬ</p><h1>Что нужно сделать сегодня?</h1><p>Важные инструменты, документы и отчёты — в одном месте.</p></div>
+            <div><p class="eyebrow">ДОБРО ПОЖАЛОВАТЬ</p><h1 id="homeGreeting">Что нужно сделать сегодня?</h1><p>Важные инструменты, документы и отчёты — в одном месте.</p></div>
             <button class="primary-action" data-go="analytics"><span>＋</span> Создать аналитику</button>
           </div>
 
           <div class="section-label"><h2>Быстрый доступ</h2><span>4 рабочих инструмента</span></div>
-          <div class="quick-grid">
+          <div class="quick-grid" data-tour="quick-access">
             <a class="tool-card tool-blue" href="https://golunovoleg111-rgb.github.io/FBS-CONVERTER/" target="_blank" rel="noreferrer">
               <div class="tool-top"><span class="tool-symbol">⇄</span><span class="external">↗</span></div>
               <div><span class="tool-kicker">ОБРАБОТКА ФАЙЛОВ</span><h3>FBS Конвертер</h3><p>Подготовка Excel к печати и выгрузка в PDF</p></div>
@@ -61,12 +62,12 @@
               <div><span class="tool-kicker">СКЛАД И ПОСТАВКИ</span><h3>FBS Сканер</h3><p>Сканирование ШК и адресное хранение товара</p></div>
               <span class="open-link">Открыть инструмент <b>→</b></span>
             </a>
-            <button class="tool-card tool-violet" data-go="fbs">
+            <button class="tool-card tool-violet" data-go="fbs" data-tour="fbs">
               <div class="tool-top"><span class="tool-symbol">▤</span><span class="external">→</span></div>
               <div><span class="tool-kicker">GOOGLE ТАБЛИЦЫ</span><h3>Рабочие таблицы FBS</h3><p>Хранение, планирование перемещений и ежедневная работа</p></div>
               <span class="open-link">Перейти к таблицам <b>→</b></span>
             </button>
-            <button class="tool-card tool-dark" data-go="analytics">
+            <button class="tool-card tool-dark" data-go="analytics" data-tour="analytics">
               <div class="tool-top"><span class="tool-symbol">✦</span><span class="external">→</span></div>
               <div><span class="tool-kicker">УМНЫЙ ПОМОЩНИК</span><h3>Конструктор аналитики</h3><p>Соберите фотографии, выводы и таблицы в один отчёт</p></div>
               <span class="open-link">Начать работу <b>→</b></span>
@@ -74,7 +75,7 @@
           </div>
 
           <div class="home-bottom">
-            <div class="recent-panel">
+            <div class="recent-panel" data-tour="files">
               <div class="panel-head"><div><span class="eyebrow">ПОСЛЕДНИЕ ДОКУМЕНТЫ</span><h2>Недавняя работа</h2></div><button data-go="files">Все файлы →</button></div>
               <div class="empty-recent" id="recentFiles"><span>□</span><div><strong>Здесь появятся ваши документы</strong><p>Создайте первый файл по шаблону или соберите аналитический отчёт.</p></div></div>
             </div>
@@ -194,6 +195,27 @@
           <div class="fbs-note"><span>i</span><p><strong>Полезно знать</strong> Если для планирования появится отдельная ссылка или вкладка Google Таблицы, её можно заменить в одной карточке, не меняя весь раздел.</p></div>
         </section>
       </main>
+    </div>
+    <div class="onboarding-backdrop is-hidden" id="profileModal" role="dialog" aria-modal="true" aria-labelledby="profileTitle">
+      <form class="profile-card" id="profileForm">
+        <div class="profile-logo"><div class="brand-mark"><span></span><span></span><span></span></div></div>
+        <p class="eyebrow">ВАШЕ РАБОЧЕЕ ПРОСТРАНСТВО</p>
+        <h2 id="profileTitle">Добро пожаловать в MyWorkspace</h2>
+        <p id="profileText">Давайте познакомимся — так рабочее пространство сможет обращаться к вам по имени.</p>
+        <label><span>Ваше имя</span><input id="profileName" maxlength="32" autocomplete="given-name" placeholder="Например, Олеся" required /></label>
+        <small>Имя сохранится только в этом браузере.</small>
+        <div class="profile-actions"><button class="ghost-button is-hidden" type="button" id="cancelProfile">Отмена</button><button class="primary-action" type="submit" id="saveProfile">Продолжить →</button></div>
+      </form>
+    </div>
+    <div class="tour-layer is-hidden" id="tourLayer" aria-live="polite">
+      <div class="tour-shade"></div>
+      <div class="tour-card" id="tourCard" role="dialog" aria-modal="true" aria-labelledby="tourTitle">
+        <div class="tour-top"><span id="tourCounter">1 из 5</span><button id="skipTour" aria-label="Закрыть обучение">×</button></div>
+        <div class="tour-icon" id="tourIcon">⌂</div>
+        <h2 id="tourTitle">Всё под рукой</h2>
+        <p id="tourText"></p>
+        <div class="tour-actions"><button class="ghost-button" id="prevTour">← Назад</button><button class="primary-action" id="nextTour">Далее →</button></div>
+      </div>
     </div>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <script type="module" src="/src/main.js"></script>

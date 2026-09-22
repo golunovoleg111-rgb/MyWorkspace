@@ -4,11 +4,21 @@ import { exportAnalyticsDocx } from './docx-export.js';
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
 const sections = { home: 'Главная', files: 'Мои файлы', analytics: 'Аналитика', fbs: 'FBS · Таблицы' };
-const keys = { files: 'myworkspace.files.v1', draft: 'myworkspace.analytics.v1' };
+const keys = { files: 'myworkspace.files.v1', draft: 'myworkspace.analytics.v1', profile: 'myworkspace.profile.v1', tour: 'myworkspace.tour.v1' };
 let files = load(keys.files, []);
 let activeFileId = null;
 let reportImages = [];
 let toastTimer;
+let profile = load(keys.profile, null);
+let tourIndex = 0;
+
+const tourSteps = [
+  { target: 'navigation', icon: '⌂', title: 'Всё под рукой', text: 'Слева находятся основные разделы: главная, ваши файлы, аналитика и рабочие таблицы FBS.' },
+  { target: 'quick-access', icon: '↗', title: 'Быстрый доступ', text: 'Отсюда открываются конвертер, сканер, Google Таблицы и конструктор аналитики.' },
+  { target: 'files', icon: '□', title: 'Мои файлы', text: 'Создавайте заметки, планы и отчёты по шаблонам. Они автоматически сохраняются в этом браузере.' },
+  { target: 'analytics', icon: '✦', title: 'Досье изделия', text: 'Здесь собирается полный путь товара: рынок, фотографии, примерки, экономика, запуск и готовый DOCX.' },
+  { target: 'fbs', icon: '▤', title: 'Рабочие таблицы FBS', text: 'Открывайте таблицы хранения и планирования перемещений, не теряя MyWorkspace.' }
+];
 
 function load(key, fallback) {
   try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; }
@@ -28,6 +38,86 @@ function toast(message) {
   $('#toast').classList.add('is-visible');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => $('#toast').classList.remove('is-visible'), 2600);
+}
+
+function updateProfileUi() {
+  const name = profile?.name?.trim();
+  $('#homeGreeting').textContent = name ? `Чем сегодня займёмся, ${name}?` : 'Что нужно сделать сегодня?';
+  $('#userName').textContent = name || 'Профиль';
+  $('#userInitial').textContent = name ? name.slice(0, 1).toUpperCase() : 'Я';
+}
+
+function openProfileModal(isEditing = false) {
+  $('#profileTitle').textContent = isEditing ? 'Как к вам обращаться?' : 'Добро пожаловать в MyWorkspace';
+  $('#profileText').textContent = isEditing ? 'Измените имя — новое обращение сразу появится на главной странице.' : 'Давайте познакомимся — так рабочее пространство сможет обращаться к вам по имени.';
+  $('#saveProfile').textContent = isEditing ? 'Сохранить' : 'Продолжить →';
+  $('#cancelProfile').classList.toggle('is-hidden', !isEditing);
+  $('#profileName').value = profile?.name || '';
+  $('#profileModal').classList.remove('is-hidden');
+  document.body.style.overflow = 'hidden';
+  window.setTimeout(() => $('#profileName').focus(), 50);
+}
+
+function closeProfileModal() {
+  $('#profileModal').classList.add('is-hidden');
+  document.body.style.overflow = '';
+}
+
+function clearTourTarget() {
+  $('.tour-target')?.classList.remove('tour-target');
+  $('#sidebar').classList.remove('is-open');
+}
+
+function positionTourCard(target) {
+  const card = $('#tourCard');
+  const rect = target.getBoundingClientRect();
+  const cardWidth = Math.min(360, window.innerWidth - 32);
+  const cardHeight = card.offsetHeight || 280;
+  const gap = 24;
+  let left;
+  let top;
+  if (rect.right + cardWidth + gap <= window.innerWidth) {
+    left = rect.right + gap;
+    top = Math.min(Math.max(rect.top, 16), window.innerHeight - cardHeight - 16);
+  } else if (rect.left - cardWidth - gap >= 0) {
+    left = rect.left - cardWidth - gap;
+    top = Math.min(Math.max(rect.top, 16), window.innerHeight - cardHeight - 16);
+  } else {
+    left = Math.min(Math.max(rect.left, 16), window.innerWidth - cardWidth - 16);
+    top = rect.bottom + cardHeight + gap <= window.innerHeight ? rect.bottom + gap : Math.max(16, rect.top - cardHeight - gap);
+  }
+  card.style.left = `${left}px`;
+  card.style.top = `${top}px`;
+}
+
+function showTourStep(index) {
+  clearTourTarget();
+  tourIndex = Math.min(Math.max(index, 0), tourSteps.length - 1);
+  const step = tourSteps[tourIndex];
+  const target = $(`[data-tour="${step.target}"]`);
+  if (!target) return finishTour();
+  if (step.target === 'navigation' && window.innerWidth <= 760) $('#sidebar').classList.add('is-open');
+  target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  $('#tourCounter').textContent = `${tourIndex + 1} из ${tourSteps.length}`;
+  $('#tourIcon').textContent = step.icon;
+  $('#tourTitle').textContent = step.title;
+  $('#tourText').textContent = step.text;
+  $('#prevTour').disabled = tourIndex === 0;
+  $('#nextTour').textContent = tourIndex === tourSteps.length - 1 ? 'Готово ✓' : 'Далее →';
+  window.setTimeout(() => { target.classList.add('tour-target'); positionTourCard(target); }, 220);
+}
+
+function startTour() {
+  switchView('home');
+  $('#tourLayer').classList.remove('is-hidden');
+  showTourStep(0);
+}
+
+function finishTour() {
+  clearTourTarget();
+  $('#tourLayer').classList.add('is-hidden');
+  save(keys.tour, true);
+  toast('Готово — вы знаете, где что находится');
 }
 
 function switchView(name) {
@@ -295,6 +385,33 @@ $$('[data-view]').forEach((button) => button.addEventListener('click', () => swi
 $$('[data-go]').forEach((button) => button.addEventListener('click', () => switchView(button.dataset.go)));
 $$('[data-template]').forEach((button) => button.addEventListener('click', () => createFile(button.dataset.template)));
 $('#mobileMenu').addEventListener('click', () => $('#sidebar').classList.toggle('is-open'));
+$('#editProfile').addEventListener('click', () => openProfileModal(true));
+$('#cancelProfile').addEventListener('click', closeProfileModal);
+$('#profileForm').addEventListener('submit', (event) => {
+  event.preventDefault();
+  const name = $('#profileName').value.trim().replace(/\s+/g, ' ').slice(0, 32);
+  if (!name) return $('#profileName').focus();
+  const firstSetup = !profile;
+  profile = { name };
+  save(keys.profile, profile);
+  updateProfileUi();
+  closeProfileModal();
+  if (firstSetup) window.setTimeout(startTour, 250);
+  else toast(`Имя изменено: ${name}`);
+});
+$('#restartTour').addEventListener('click', startTour);
+$('#skipTour').addEventListener('click', finishTour);
+$('#nextTour').addEventListener('click', () => tourIndex === tourSteps.length - 1 ? finishTour() : showTourStep(tourIndex + 1));
+$('#prevTour').addEventListener('click', () => showTourStep(tourIndex - 1));
+window.addEventListener('resize', () => {
+  const target = $('.tour-target');
+  if (target && !$('#tourLayer').classList.contains('is-hidden')) positionTourCard(target);
+});
+document.addEventListener('keydown', (event) => {
+  if (event.key !== 'Escape') return;
+  if (!$('#tourLayer').classList.contains('is-hidden')) finishTour();
+  else if (!$('#profileModal').classList.contains('is-hidden') && profile) closeProfileModal();
+});
 $('#fileSearch').addEventListener('input', renderFiles);
 $('#closeEditor').addEventListener('click', closeEditor); $('#deleteFile').addEventListener('click', deleteFile);
 $('#fileTitle').addEventListener('input', saveActiveFile); $('#fileContent').addEventListener('input', saveActiveFile);
@@ -313,5 +430,9 @@ $('#exportPdf').addEventListener('click', () => { buildReport(false); window.pri
 
 $('#today').textContent = new Intl.DateTimeFormat('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date());
 $('#reportPreview').innerHTML = reportMarkup(reportData());
-updateFileCounts(); renderFiles(); loadDraft(); updateProgress(); registerWebMcp();
-window.setTimeout(() => $('#welcome')?.remove(), 2500);
+updateFileCounts(); renderFiles(); loadDraft(); updateProgress(); updateProfileUi(); registerWebMcp();
+window.setTimeout(() => {
+  $('#welcome')?.remove();
+  if (!profile) openProfileModal(false);
+  else if (!load(keys.tour, false)) startTour();
+}, 2350);

@@ -139,50 +139,80 @@ async function prepareImage(file) {
   const canvas = document.createElement('canvas');
   canvas.width = Math.round(image.width * scale); canvas.height = Math.round(image.height * scale);
   canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
-  return { id: crypto.randomUUID(), src: canvas.toDataURL('image/jpeg', .8), caption: file.name.replace(/\.[^.]+$/, ''), width: canvas.width, height: canvas.height };
+  return { id: crypto.randomUUID(), src: canvas.toDataURL('image/jpeg', .82), caption: file.name.replace(/\.[^.]+$/, ''), category: 'Примерка', width: canvas.width, height: canvas.height };
 }
 
 async function addImages(event) {
-  const chosen = [...event.target.files].slice(0, Math.max(0, 6 - reportImages.length));
+  const chosen = [...event.target.files].slice(0, Math.max(0, 12 - reportImages.length));
   if (!chosen.length) return;
   toast('Подготавливаю изображения…');
   reportImages.push(...await Promise.all(chosen.map(prepareImage)));
   renderImages();
   buildReport(false);
+  updateProgress();
   event.target.value = '';
 }
 
 function renderImages() {
-  $('#imageList').innerHTML = reportImages.map((image) => `<div class="image-item"><img src="${image.src}" alt="" /><input value="${escapeHtml(image.caption)}" data-caption-id="${image.id}" aria-label="Подпись к изображению" /><button data-remove-image="${image.id}" aria-label="Удалить изображение">×</button></div>`).join('');
+  const categories = ['Конкурент', 'Примерка', 'Дефект', 'Ткань', 'Посылка', 'Другое'];
+  $('#imageList').innerHTML = reportImages.map((image) => `<div class="image-item"><img src="${image.src}" alt="" /><div class="image-fields"><select data-category-id="${image.id}" aria-label="Тип изображения">${categories.map((category) => `<option${category === image.category ? ' selected' : ''}>${category}</option>`).join('')}</select><input value="${escapeHtml(image.caption)}" data-caption-id="${image.id}" aria-label="Подпись к изображению" /></div><button data-remove-image="${image.id}" aria-label="Удалить изображение">×</button></div>`).join('');
   $$('[data-caption-id]').forEach((input) => input.addEventListener('input', () => {
     reportImages.find((item) => item.id === input.dataset.captionId).caption = input.value; buildReport(false);
   }));
+  $$('[data-category-id]').forEach((select) => select.addEventListener('change', () => {
+    reportImages.find((item) => item.id === select.dataset.categoryId).category = select.value; buildReport(false);
+  }));
   $$('[data-remove-image]').forEach((button) => button.addEventListener('click', () => {
-    reportImages = reportImages.filter((item) => item.id !== button.dataset.removeImage); renderImages(); buildReport(false);
+    reportImages = reportImages.filter((item) => item.id !== button.dataset.removeImage); renderImages(); buildReport(false); updateProgress();
   }));
 }
 
-function tableData() {
+function tableData(selector) {
+  const table = $(selector);
   return {
-    headers: $$('.input-table thead th').map((cell) => cell.textContent.trim()),
-    rows: $$('.input-table tbody tr').map((row) => [...row.cells].map((cell) => cell.textContent.trim()))
+    headers: [...table.querySelectorAll('thead th')].map((cell) => cell.textContent.trim()),
+    rows: [...table.querySelectorAll('tbody tr')].map((row) => [...row.cells].map((cell) => cell.textContent.trim()))
   };
 }
 
+const dossierIds = [
+  'reportTitle', 'reportPeriod', 'productCategory', 'projectStage', 'projectOwner', 'projectGoal',
+  'marketVolume', 'averagePrice', 'seasonality', 'competitorName', 'competitorPrice', 'marketStrengths',
+  'marketRisks', 'reportObservation', 'fittingNotes', 'productDefects', 'fabricConsumption', 'fabricPrice',
+  'sewingCost', 'fabricSource', 'fabricMoq', 'fabricNotes', 'launchColors', 'launchMonth', 'parcelNotes',
+  'reportConclusion', 'reportActions', 'productDescription'
+];
+
 function reportData() {
-  return {
-    title: $('#reportTitle').value.trim(), period: $('#reportPeriod').value.trim(), observation: $('#reportObservation').value.trim(),
-    conclusion: $('#reportConclusion').value.trim(), actions: $('#reportActions').value.trim(), table: tableData(), images: reportImages
-  };
+  const values = Object.fromEntries(dossierIds.map((id) => [id, $(`#${id}`).value.trim()]));
+  return { ...values, title: values.reportTitle, period: values.reportPeriod, observation: values.reportObservation,
+    conclusion: values.reportConclusion, actions: values.reportActions, images: reportImages,
+    measurements: tableData('#measurementsTable'), timeline: tableData('#timelineTable'),
+    economics: tableData('#economicsTable'), sizes: tableData('#sizesTable') };
+}
+
+function meaningfulRows(table) {
+  return table.rows.filter((row) => row.some((cell) => cell && cell !== '—'));
+}
+
+function previewTable(title, table) {
+  const rows = meaningfulRows(table);
+  if (!rows.length) return '';
+  return `<section><h2>${title}</h2><table class="report-table"><thead><tr>${table.headers.map((cell) => `<th>${escapeHtml(cell)}</th>`).join('')}</tr></thead><tbody>${rows.slice(0, 6).map((row) => `<tr>${row.map((cell) => `<td>${escapeHtml(cell)}</td>`).join('')}</tr>`).join('')}</tbody></table></section>`;
 }
 
 function reportMarkup(data, emptyAllowed = true) {
-  const hasContent = data.title || data.observation || data.conclusion || data.actions || data.images.length;
-  if (!hasContent && emptyAllowed) return '<div class="report-empty"><span>✦</span><strong>Будущий отчёт появится здесь</strong><p>Заполните поля слева — предпросмотр будет обновляться автоматически.</p></div>';
+  const hasContent = dossierIds.some((id) => data[id]) || data.images.length;
+  if (!hasContent && emptyAllowed) return '<div class="report-empty"><span>✦</span><strong>Досье появится здесь</strong><p>Заполняйте разделы слева — документ будет собираться автоматически.</p></div>';
   const actions = data.actions.split('\n').map((line) => line.trim()).filter(Boolean);
-  const hasTable = data.table.rows.some((row) => row.some((cell) => cell && cell !== '—' && cell !== 'Наименование' && cell !== 'Результат'));
-  const table = hasTable ? `<section><h2>Данные</h2><table class="report-table"><thead><tr>${data.table.headers.map((cell) => `<th>${escapeHtml(cell)}</th>`).join('')}</tr></thead><tbody>${data.table.rows.map((row) => `<tr>${row.map((cell) => `<td>${escapeHtml(cell)}</td>`).join('')}</tr>`).join('')}</tbody></table></section>` : '';
-  return `<article class="report-doc"><span class="report-mark">MYWORKSPACE · АНАЛИТИКА</span><h1>${escapeHtml(data.title || 'Аналитический отчёт')}</h1><div class="report-period">${escapeHtml(data.period || formatDate(new Date()))}</div><div class="report-rule"></div>${data.observation ? `<section><h2>Наблюдение</h2><p>${escapeHtml(data.observation).replace(/\n/g, '<br>')}</p></section>` : ''}${data.images.length ? `<section><h2>Материалы</h2><div class="report-images">${data.images.map((image) => `<div class="report-image"><img src="${image.src}" alt="" /><small>${escapeHtml(image.caption)}</small></div>`).join('')}</div></section>` : ''}${table}${data.conclusion ? `<section><h2>Вывод</h2><p>${escapeHtml(data.conclusion).replace(/\n/g, '<br>')}</p></section>` : ''}${actions.length ? `<section><h2>Следующие действия</h2><ul>${actions.map((action) => `<li>${escapeHtml(action.replace(/^[•\-–\d.)\s]+/, ''))}</li>`).join('')}</ul></section>` : ''}</article>`;
+  const meta = [data.productCategory, data.projectStage, data.projectOwner].filter(Boolean).map(escapeHtml).join(' · ');
+  return `<article class="report-doc dossier-doc"><span class="report-mark">MYWORKSPACE · ДОСЬЕ ИЗДЕЛИЯ</span><h1>${escapeHtml(data.title || 'Разработка товара')}</h1><div class="report-period">${escapeHtml(data.period || formatDate(new Date()))}</div>${meta ? `<p class="report-meta">${meta}</p>` : ''}<div class="report-rule"></div>
+  ${data.projectGoal ? `<section><h2>Задача проекта</h2><p>${escapeHtml(data.projectGoal).replace(/\n/g, '<br>')}</p></section>` : ''}
+  ${(data.marketVolume || data.averagePrice || data.seasonality || data.competitorName) ? `<section><h2>Рынок и конкурент</h2><div class="preview-facts">${data.marketVolume ? `<div><b>${escapeHtml(data.marketVolume)}</b><span>товаров в категории</span></div>` : ''}${data.averagePrice ? `<div><b>${escapeHtml(data.averagePrice)}</b><span>средняя цена</span></div>` : ''}${data.competitorName ? `<div><b>${escapeHtml(data.competitorName)}</b><span>главный конкурент</span></div>` : ''}</div>${data.observation ? `<p>${escapeHtml(data.observation).replace(/\n/g, '<br>')}</p>` : ''}</section>` : ''}
+  ${data.images.length ? `<section><h2>Материалы</h2><div class="report-images">${data.images.slice(0, 4).map((image) => `<div class="report-image"><img src="${image.src}" alt="" /><small><b>${escapeHtml(image.category || 'Материал')}</b> · ${escapeHtml(image.caption)}</small></div>`).join('')}</div></section>` : ''}
+  ${data.fittingNotes ? `<section><h2>Примерка и образцы</h2><p>${escapeHtml(data.fittingNotes).replace(/\n/g, '<br>')}</p></section>` : ''}
+  ${previewTable('Замеры', data.measurements)}${previewTable('Экономика', data.economics)}${previewTable('Первый заказ', data.sizes)}
+  ${data.conclusion ? `<section><h2>Итоговое решение</h2><p>${escapeHtml(data.conclusion).replace(/\n/g, '<br>')}</p></section>` : ''}${actions.length ? `<section><h2>Следующие действия</h2><ul>${actions.map((action) => `<li>${escapeHtml(action.replace(/^[•\-–\d.)\s]+/, ''))}</li>`).join('')}</ul></section>` : ''}</article>`;
 }
 
 function buildReport(notify = true) {
@@ -195,7 +225,7 @@ function saveDraft() {
   save(keys.draft, { ...data, images: [] });
   const now = new Date().toISOString();
   const existing = files.find((file) => file.analyticsDraft);
-  const content = [data.observation, data.conclusion, data.actions].filter(Boolean).join('\n\n');
+  const content = [data.projectGoal, data.observation, data.fittingNotes, data.conclusion, data.actions].filter(Boolean).join('\n\n');
   if (existing) Object.assign(existing, { title: data.title || 'Черновик аналитики', content, updatedAt: now });
   else files.unshift({ id: crypto.randomUUID(), title: data.title || 'Черновик аналитики', type: 'Аналитика', content, createdAt: now, updatedAt: now, analyticsDraft: true });
   save(keys.files, files); updateFileCounts(); toast('Черновик сохранён в «Мои файлы»');
@@ -204,14 +234,20 @@ function saveDraft() {
 function loadDraft() {
   const data = load(keys.draft, null);
   if (!data) return;
-  $('#reportTitle').value = data.title || ''; $('#reportPeriod').value = data.period || '';
-  $('#reportObservation').value = data.observation || ''; $('#reportConclusion').value = data.conclusion || ''; $('#reportActions').value = data.actions || '';
+  if (!data.reportTitle && data.title) data.reportTitle = data.title;
+  if (!data.reportPeriod && data.period) data.reportPeriod = data.period;
+  dossierIds.forEach((id) => { if (data[id] !== undefined) $(`#${id}`).value = data[id]; });
+  [['#measurementsTable', data.measurements], ['#timelineTable', data.timeline], ['#economicsTable', data.economics], ['#sizesTable', data.sizes]].forEach(([selector, table]) => {
+    if (!table?.rows?.length) return;
+    $(`${selector} tbody`).innerHTML = table.rows.map((row) => `<tr>${row.map((cell) => `<td contenteditable="true">${escapeHtml(cell)}</td>`).join('')}</tr>`).join('');
+  });
   buildReport(false);
+  updateProgress();
 }
 
 function resetReport() {
-  ['#reportTitle', '#reportPeriod', '#reportObservation', '#reportConclusion', '#reportActions'].forEach((selector) => $(selector).value = '');
-  reportImages = []; renderImages(); localStorage.removeItem(keys.draft); buildReport(false); toast('Форма очищена');
+  dossierIds.forEach((id) => { $(`#${id}`).value = ''; });
+  reportImages = []; renderImages(); localStorage.removeItem(keys.draft); buildReport(false); updateProgress(); toast('Форма очищена');
 }
 
 async function exportWord() {
@@ -227,16 +263,23 @@ async function exportWord() {
     toast('Не удалось собрать DOCX. Попробуйте ещё раз');
   } finally {
     button.disabled = false;
-    button.textContent = 'DOCX / Google Документы';
+    button.textContent = 'DOCX для Google Документов';
   }
 }
 
 function safeName(name) { return name.replace(/[\\/:*?"<>|]/g, '').trim().slice(0, 80) || 'Аналитика'; }
 
-function addTableRow() {
+function addTableRow(tableSelector, cells) {
   const row = document.createElement('tr');
-  row.innerHTML = '<td contenteditable="true">Новый показатель</td><td contenteditable="true">—</td><td contenteditable="true">—</td>';
-  $('#analyticsTable').append(row); buildReport(false);
+  row.innerHTML = cells.map((cell) => `<td contenteditable="true">${cell}</td>`).join('');
+  $(`${tableSelector} tbody`).append(row); buildReport(false);
+}
+
+function updateProgress() {
+  const fields = $$('[data-dossier-field]');
+  const completed = fields.filter((field) => field.value.trim()).length + (reportImages.length ? 1 : 0);
+  const percent = Math.round((completed / (fields.length + 1)) * 100);
+  $('#dossierProgress').textContent = `${percent}%`;
 }
 
 function registerWebMcp() {
@@ -255,13 +298,20 @@ $('#mobileMenu').addEventListener('click', () => $('#sidebar').classList.toggle(
 $('#fileSearch').addEventListener('input', renderFiles);
 $('#closeEditor').addEventListener('click', closeEditor); $('#deleteFile').addEventListener('click', deleteFile);
 $('#fileTitle').addEventListener('input', saveActiveFile); $('#fileContent').addEventListener('input', saveActiveFile);
-$('#imageUpload').addEventListener('change', addImages); $('#addRow').addEventListener('click', addTableRow);
-['#reportTitle', '#reportPeriod', '#reportObservation', '#reportConclusion', '#reportActions'].forEach((selector) => $(selector).addEventListener('input', () => buildReport(false)));
-$('.input-table').addEventListener('input', () => buildReport(false));
+$('#imageUpload').addEventListener('change', addImages);
+$('#addMeasurement').addEventListener('click', () => addTableRow('#measurementsTable', ['Часть изделия', 'Новый параметр', '—']));
+$('#addTimeline').addEventListener('click', () => addTableRow('#timelineTable', ['—', 'Новое событие', 'В работе']));
+$('#addEconomic').addEventListener('click', () => addTableRow('#economicsTable', ['Новый показатель', '—', '—']));
+$('#addSize').addEventListener('click', () => addTableRow('#sizesTable', ['—', '—', '—']));
+$$('[data-dossier-field]').forEach((field) => field.addEventListener('input', () => { buildReport(false); updateProgress(); }));
+$$('.input-table').forEach((table) => table.addEventListener('input', () => buildReport(false)));
+$$('[data-jump]').forEach((button) => button.addEventListener('click', () => {
+  const section = $(`#${button.dataset.jump}`); section.open = true; section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}));
 $('#buildReport').addEventListener('click', () => buildReport(true)); $('#saveDraft').addEventListener('click', saveDraft); $('#resetReport').addEventListener('click', resetReport);
 $('#exportPdf').addEventListener('click', () => { buildReport(false); window.print(); }); $('#exportWord').addEventListener('click', exportWord);
 
 $('#today').textContent = new Intl.DateTimeFormat('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date());
 $('#reportPreview').innerHTML = reportMarkup(reportData());
-updateFileCounts(); renderFiles(); loadDraft(); registerWebMcp();
+updateFileCounts(); renderFiles(); loadDraft(); updateProgress(); registerWebMcp();
 window.setTimeout(() => $('#welcome')?.remove(), 2500);

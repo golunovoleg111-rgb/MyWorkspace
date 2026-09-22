@@ -101,34 +101,85 @@
         </section>
 
         <section class="view" id="view-analytics">
-          <div class="page-heading compact-heading analytics-heading"><div><p class="eyebrow">УМНЫЙ ПОМОЩНИК</p><h1>Конструктор аналитики</h1><p>Соберите факты, изображения и выводы — оформление отчёта произойдёт автоматически.</p></div><div class="step-status"><span>1</span><b>Материал</b><i></i><span>2</span><b>Отчёт</b></div></div>
-          <div class="analytics-layout">
+          <div class="page-heading compact-heading analytics-heading">
+            <div><p class="eyebrow">ДОСЬЕ ИЗДЕЛИЯ</p><h1>Разработка товара</h1><p>Весь путь изделия: рынок, образцы, примерки, экономика, запуск и итоговое описание.</p></div>
+            <div class="dossier-progress"><strong id="dossierProgress">0%</strong><span>заполнено</span></div>
+          </div>
+          <div class="dossier-nav" aria-label="Разделы досье">
+            <button data-jump="section-base">01 Паспорт</button><button data-jump="section-market">02 Рынок</button><button data-jump="section-media">03 Материалы</button><button data-jump="section-product">04 Изделие</button><button data-jump="section-launch">05 Запуск</button><button data-jump="section-final">06 Итог</button>
+          </div>
+          <div class="analytics-layout dossier-layout">
             <div class="composer">
-              <div class="composer-section">
-                <div class="composer-head"><span class="step-number">01</span><div><h2>Основа отчёта</h2><p>Задайте тему и кратко опишите ситуацию</p></div></div>
-                <div class="form-grid two"><label><span>Название аналитики</span><input id="reportTitle" placeholder="Например: Анализ выкладки за сентябрь" /></label><label><span>Период</span><input id="reportPeriod" placeholder="01–30 сентября 2026" /></label></div>
-                <label><span>Что мы видим</span><textarea id="reportObservation" rows="4" placeholder="Опишите ситуацию простыми словами: что изменилось, на что важно обратить внимание..."></textarea></label>
-              </div>
-              <div class="composer-section">
-                <div class="composer-head"><span class="step-number">02</span><div><h2>Фото и срезы</h2><p>Добавьте изображения и подпишите, что на них важно</p></div></div>
-                <label class="upload-zone" id="uploadZone"><input id="imageUpload" type="file" accept="image/*" multiple /><span class="upload-icon">＋</span><strong>Добавить изображения</strong><small>JPG, PNG или WEBP · можно выбрать несколько</small></label>
-                <div class="image-list" id="imageList"></div>
-              </div>
-              <div class="composer-section">
-                <div class="composer-head"><span class="step-number">03</span><div><h2>Таблица</h2><p>Зафиксируйте показатели или сравнение</p></div><button class="small-button" id="addRow">＋ Строка</button></div>
-                <div class="table-scroll"><table class="input-table"><thead><tr><th contenteditable="true">Показатель</th><th contenteditable="true">Было</th><th contenteditable="true">Стало</th></tr></thead><tbody id="analyticsTable"><tr><td contenteditable="true">Наименование</td><td contenteditable="true">—</td><td contenteditable="true">—</td></tr><tr><td contenteditable="true">Результат</td><td contenteditable="true">—</td><td contenteditable="true">—</td></tr></tbody></table></div>
-              </div>
-              <div class="composer-section">
-                <div class="composer-head"><span class="step-number">04</span><div><h2>Вывод и действия</h2><p>Сформулируйте главную мысль и следующий шаг</p></div></div>
-                <label><span>Основной вывод</span><textarea id="reportConclusion" rows="4" placeholder="Главный вывод по итогам анализа..."></textarea></label>
-                <label><span>Что предлагаем сделать</span><textarea id="reportActions" rows="4" placeholder="Перечислите понятные действия, каждое с новой строки..."></textarea></label>
-              </div>
-              <div class="composer-actions"><button class="ghost-button" id="saveDraft">Сохранить черновик</button><button class="primary-action" id="buildReport">✦ Сформировать аналитику</button></div>
+              <details class="dossier-section" id="section-base" open>
+                <summary><span class="step-number">01</span><div><h2>Паспорт проекта</h2><p>Что разрабатываем и на каком этапе</p></div><b>⌄</b></summary>
+                <div class="dossier-body">
+                  <div class="form-grid two"><label><span>Название изделия</span><input id="reportTitle" data-dossier-field placeholder="Спортивный костюм женский" /></label><label><span>Дата отчёта</span><input id="reportPeriod" data-dossier-field placeholder="22.05.2026" /></label></div>
+                  <div class="form-grid three"><label><span>Категория</span><input id="productCategory" data-dossier-field placeholder="Костюм женский спортивный" /></label><label><span>Этап</span><select id="projectStage" data-dossier-field><option value="">Выберите этап</option><option>Исследование</option><option>Выбор образца</option><option>Разработка лекала</option><option>Примерка</option><option>Подготовка запуска</option><option>Готово к запуску</option></select></label><label><span>Ответственный</span><input id="projectOwner" data-dossier-field placeholder="Имя сотрудника" /></label></div>
+                  <label><span>Задача проекта</span><textarea id="projectGoal" data-dossier-field rows="3" placeholder="Какой товар хотим получить и для кого"></textarea></label>
+                </div>
+              </details>
+
+              <details class="dossier-section" id="section-market" open>
+                <summary><span class="step-number">02</span><div><h2>Рынок и конкуренты</h2><p>Категория, спрос, цена и отзывы</p></div><b>⌄</b></summary>
+                <div class="dossier-body">
+                  <div class="form-grid three"><label><span>Товаров в категории</span><input id="marketVolume" data-dossier-field placeholder="46 169" /></label><label><span>Средняя цена</span><input id="averagePrice" data-dossier-field placeholder="7 500–8 800 ₽" /></label><label><span>Сезонность</span><input id="seasonality" data-dossier-field placeholder="Пик: февраль–март, сентябрь" /></label></div>
+                  <div class="form-grid two"><label><span>Главный конкурент</span><input id="competitorName" data-dossier-field placeholder="LOOK.IN" /></label><label><span>Цена конкурента</span><input id="competitorPrice" data-dossier-field placeholder="7 030 ₽ для клиента" /></label></div>
+                  <label><span>Что покупатели ценят</span><textarea id="marketStrengths" data-dossier-field rows="3" placeholder="Посадка, внешний вид, качество пошива..."></textarea></label>
+                  <label><span>Риски и жалобы</span><textarea id="marketRisks" data-dossier-field rows="3" placeholder="Фурнитура, ткань, длина, размерность..."></textarea></label>
+                  <label><span>Вывод по рынку</span><textarea id="reportObservation" data-dossier-field rows="4" placeholder="Почему изделие стоит или не стоит брать в разработку"></textarea></label>
+                </div>
+              </details>
+
+              <details class="dossier-section" id="section-media" open>
+                <summary><span class="step-number">03</span><div><h2>Фото и материалы</h2><p>Конкуренты, примерки, дефекты, ткань и посылки</p></div><b>⌄</b></summary>
+                <div class="dossier-body">
+                  <label class="upload-zone" id="uploadZone"><input id="imageUpload" type="file" accept="image/*" multiple /><span class="upload-icon">＋</span><strong>Добавить изображения</strong><small>До 12 изображений · укажите тип и подпись к каждому</small></label>
+                  <div class="image-list" id="imageList"></div>
+                </div>
+              </details>
+
+              <details class="dossier-section" id="section-product" open>
+                <summary><span class="step-number">04</span><div><h2>Изделие и образцы</h2><p>Примерка, дефекты, замеры и хронология</p></div><b>⌄</b></summary>
+                <div class="dossier-body">
+                  <label><span>Мнение по образцам и примерке</span><textarea id="fittingNotes" data-dossier-field rows="5" placeholder="Как село изделие, что понравилось, что нужно изменить"></textarea></label>
+                  <label><span>Дефекты и доработки</span><textarea id="productDefects" data-dossier-field rows="4" placeholder="Каждый дефект или доработка — с новой строки"></textarea></label>
+                  <div class="subsection-head"><div><h3>Замеры</h3><p>Кофта, брюки и другие части изделия</p></div><button class="small-button" id="addMeasurement">＋ Строка</button></div>
+                  <div class="table-scroll"><table class="input-table" id="measurementsTable"><thead><tr><th>Часть</th><th>Параметр</th><th>Значение</th></tr></thead><tbody><tr><td contenteditable="true">Кофта</td><td contenteditable="true">Полуобхват груди</td><td contenteditable="true">—</td></tr><tr><td contenteditable="true">Брюки</td><td contenteditable="true">Длина брюк</td><td contenteditable="true">—</td></tr></tbody></table></div>
+                  <div class="subsection-head"><div><h3>Хронология</h3><p>Ключевые решения и перемещения образцов</p></div><button class="small-button" id="addTimeline">＋ Событие</button></div>
+                  <div class="table-scroll"><table class="input-table" id="timelineTable"><thead><tr><th>Дата</th><th>Событие</th><th>Статус</th></tr></thead><tbody><tr><td contenteditable="true">—</td><td contenteditable="true">Получили образец</td><td contenteditable="true">Готово</td></tr></tbody></table></div>
+                </div>
+              </details>
+
+              <details class="dossier-section" id="section-launch" open>
+                <summary><span class="step-number">05</span><div><h2>Экономика и запуск</h2><p>Себестоимость, ткань, размеры и первый заказ</p></div><b>⌄</b></summary>
+                <div class="dossier-body">
+                  <div class="subsection-head"><div><h3>Экономика единицы</h3><p>Без сложных формул — только итоговые показатели</p></div><button class="small-button" id="addEconomic">＋ Показатель</button></div>
+                  <div class="table-scroll"><table class="input-table" id="economicsTable"><thead><tr><th>Показатель</th><th>Значение</th><th>Комментарий</th></tr></thead><tbody><tr><td contenteditable="true">Закупочная цена</td><td contenteditable="true">—</td><td contenteditable="true">—</td></tr><tr><td contenteditable="true">Рыночная цена</td><td contenteditable="true">—</td><td contenteditable="true">—</td></tr><tr><td contenteditable="true">Маржинальность</td><td contenteditable="true">—</td><td contenteditable="true">—</td></tr></tbody></table></div>
+                  <div class="form-grid three"><label><span>Расход ткани</span><input id="fabricConsumption" data-dossier-field placeholder="2,4 м" /></label><label><span>Стоимость ткани</span><input id="fabricPrice" data-dossier-field placeholder="7 $ / метр" /></label><label><span>Стоимость пошива</span><input id="sewingCost" data-dossier-field placeholder="550 сом" /></label></div>
+                  <div class="form-grid two"><label><span>Источник ткани</span><input id="fabricSource" data-dossier-field placeholder="Бишкек / Китай" /></label><label><span>Минимальный заказ</span><input id="fabricMoq" data-dossier-field placeholder="2 000 метров на цвет" /></label></div>
+                  <label><span>Комментарий по ткани</span><textarea id="fabricNotes" data-dossier-field rows="3" placeholder="Сравнение вариантов, качество и договорённости"></textarea></label>
+                  <div class="form-grid two"><label><span>Цвета запуска</span><input id="launchColors" data-dossier-field placeholder="Серый, графит, коричневый, чёрный" /></label><label><span>Лучший месяц запуска</span><input id="launchMonth" data-dossier-field placeholder="Февраль или август" /></label></div>
+                  <div class="subsection-head"><div><h3>Первый заказ</h3><p>Распределение количества по размерам</p></div><button class="small-button" id="addSize">＋ Размер</button></div>
+                  <div class="table-scroll"><table class="input-table compact-table" id="sizesTable"><thead><tr><th>Размер</th><th>Количество на цвет</th><th>Комментарий</th></tr></thead><tbody><tr><td contenteditable="true">42</td><td contenteditable="true">—</td><td contenteditable="true">Средний спрос</td></tr><tr><td contenteditable="true">44–48</td><td contenteditable="true">—</td><td contenteditable="true">Основной объём</td></tr><tr><td contenteditable="true">50–52</td><td contenteditable="true">—</td><td contenteditable="true">Средний спрос</td></tr></tbody></table></div>
+                  <label><span>Посылки и логистика</span><textarea id="parcelNotes" data-dossier-field rows="3" placeholder="Что и куда отправлено, текущий статус"></textarea></label>
+                </div>
+              </details>
+
+              <details class="dossier-section" id="section-final" open>
+                <summary><span class="step-number">06</span><div><h2>Итог и карточка товара</h2><p>Решение, следующие шаги и готовое описание</p></div><b>⌄</b></summary>
+                <div class="dossier-body">
+                  <label><span>Итоговое решение</span><textarea id="reportConclusion" data-dossier-field rows="4" placeholder="Запускаем, дорабатываем или отказываемся — и почему"></textarea></label>
+                  <label><span>Следующие действия</span><textarea id="reportActions" data-dossier-field rows="4" placeholder="Каждое действие — с новой строки"></textarea></label>
+                  <label><span>Описание товара</span><textarea id="productDescription" data-dossier-field rows="7" placeholder="Готовый текст для карточки товара"></textarea></label>
+                </div>
+              </details>
+
+              <div class="composer-actions"><button class="ghost-button" id="saveDraft">Сохранить черновик</button><button class="primary-action" id="buildReport">✦ Собрать досье изделия</button></div>
             </div>
             <aside class="report-side">
-              <div class="preview-label"><span>ПРЕДПРОСМОТР</span><button id="resetReport">Очистить</button></div>
-              <div class="report-preview" id="reportPreview"></div>
-              <div class="export-panel"><div><strong>Отчёт готов к выгрузке</strong><span>DOCX можно загрузить в Google Документы</span></div><div class="export-buttons"><button id="exportPdf">PDF</button><button id="exportWord">DOCX / Google Документы</button></div></div>
+              <div class="preview-label"><span>ПРЕДПРОСМОТР ДОСЬЕ</span><button id="resetReport">Очистить</button></div>
+              <div class="report-preview dossier-preview" id="reportPreview"></div>
+              <div class="export-panel"><div><strong>Досье готово к выгрузке</strong><span>DOCX адаптирован для импорта в Google Документы</span></div><div class="export-buttons"><button id="exportPdf">PDF</button><button id="exportWord">DOCX для Google Документов</button></div></div>
             </aside>
           </div>
         </section>

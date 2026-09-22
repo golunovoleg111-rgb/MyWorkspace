@@ -1,4 +1,5 @@
 import './styles.css';
+import { exportAnalyticsDocx } from './docx-export.js';
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -138,7 +139,7 @@ async function prepareImage(file) {
   const canvas = document.createElement('canvas');
   canvas.width = Math.round(image.width * scale); canvas.height = Math.round(image.height * scale);
   canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
-  return { id: crypto.randomUUID(), src: canvas.toDataURL('image/jpeg', .8), caption: file.name.replace(/\.[^.]+$/, '') };
+  return { id: crypto.randomUUID(), src: canvas.toDataURL('image/jpeg', .8), caption: file.name.replace(/\.[^.]+$/, ''), width: canvas.width, height: canvas.height };
 }
 
 async function addImages(event) {
@@ -213,14 +214,21 @@ function resetReport() {
   reportImages = []; renderImages(); localStorage.removeItem(keys.draft); buildReport(false); toast('Форма очищена');
 }
 
-function exportWord() {
+async function exportWord() {
   const data = reportData();
-  const styles = 'body{font-family:Arial,sans-serif;color:#293241;line-height:1.55;padding:28px}h1{font-size:28px}h2{font-size:13px;color:#2563eb;text-transform:uppercase;margin-top:24px}img{max-width:46%;margin:6px}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccd3dd;padding:8px;text-align:left}.report-period{color:#778195}';
-  const html = `<!doctype html><html><head><meta charset="utf-8"><style>${styles}</style></head><body>${reportMarkup(data, false)}</body></html>`;
-  const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
-  const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `${safeName(data.title || 'Аналитика')}.doc`; link.click();
-  setTimeout(() => URL.revokeObjectURL(link.href), 1000);
-  toast('Файл скачан — его можно открыть в Google Документах');
+  const button = $('#exportWord');
+  button.disabled = true;
+  button.textContent = 'Собираю DOCX…';
+  try {
+    await exportAnalyticsDocx(data, safeName(data.title || 'Аналитика'));
+    toast('DOCX скачан — загрузите его в Google Документы');
+  } catch (error) {
+    console.error(error);
+    toast('Не удалось собрать DOCX. Попробуйте ещё раз');
+  } finally {
+    button.disabled = false;
+    button.textContent = 'DOCX / Google Документы';
+  }
 }
 
 function safeName(name) { return name.replace(/[\\/:*?"<>|]/g, '').trim().slice(0, 80) || 'Аналитика'; }

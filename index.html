@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#111827" />
+    <meta name="description" content="MyWorkspace — рабочее пространство для FBS-инструментов, файлов и аналитических отчётов." />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23111827'/%3E%3Cpath d='M15 19h15l5 6h14v23H15z' fill='%233b82f6'/%3E%3Cpath d='M15 25h34v8H15z' fill='%2393c5fd'/%3E%3C/svg%3E" />
+    <title>MyWorkspace</title>
+  </head>
+  <body>
+    <div class="welcome" id="welcome" aria-hidden="true">
+      <div class="welcome-mark"><span></span><span></span><span></span></div>
+      <p>MYWORKSPACE</p>
+      <div class="welcome-line"></div>
+    </div>
+
+    <div class="app-shell">
+      <aside class="sidebar" id="sidebar">
+        <div class="brand" aria-label="MyWorkspace">
+          <div class="brand-mark"><span></span><span></span><span></span></div>
+          <div><strong>MyWorkspace</strong><small>рабочий центр</small></div>
+        </div>
+
+        <nav class="main-nav" aria-label="Основная навигация">
+          <button class="nav-item is-active" data-view="home"><span class="nav-icon">⌂</span><span>Главная</span></button>
+          <button class="nav-item" data-view="files"><span class="nav-icon">□</span><span>Мои файлы</span><span class="nav-count" id="filesCount">0</span></button>
+          <button class="nav-item" data-view="analytics"><span class="nav-icon">✦</span><span>Аналитика</span></button>
+          <button class="nav-item" data-view="fbs"><span class="nav-icon">↗</span><span>FBS · Таблицы</span></button>
+        </nav>
+
+        <div class="sidebar-note">
+          <span class="pulse-dot"></span>
+          <div><strong>Всё работает локально</strong><p>Данные остаются на этом устройстве</p></div>
+        </div>
+        <div class="sidebar-footer">v1.0 · личное пространство</div>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <button class="mobile-menu" id="mobileMenu" aria-label="Открыть меню">☰</button>
+          <div class="breadcrumbs"><span>Рабочее пространство</span><b>/</b><strong id="currentSection">Главная</strong></div>
+          <div class="today" id="today"></div>
+        </header>
+
+        <section class="view is-active" id="view-home">
+          <div class="page-heading home-heading">
+            <div><p class="eyebrow">ДОБРО ПОЖАЛОВАТЬ</p><h1>Что нужно сделать сегодня?</h1><p>Важные инструменты, документы и отчёты — в одном месте.</p></div>
+            <button class="primary-action" data-go="analytics"><span>＋</span> Создать аналитику</button>
+          </div>
+
+          <div class="section-label"><h2>Быстрый доступ</h2><span>4 рабочих инструмента</span></div>
+          <div class="quick-grid">
+            <a class="tool-card tool-blue" href="https://golunovoleg111-rgb.github.io/FBS-CONVERTER/" target="_blank" rel="noreferrer">
+              <div class="tool-top"><span class="tool-symbol">⇄</span><span class="external">↗</span></div>
+              <div><span class="tool-kicker">ОБРАБОТКА ФАЙЛОВ</span><h3>FBS Конвертер</h3><p>Подготовка Excel к печати и выгрузка в PDF</p></div>
+              <span class="open-link">Открыть инструмент <b>→</b></span>
+            </a>
+            <a class="tool-card tool-cyan" href="https://fbswb.tiovskiy.ru/" target="_blank" rel="noreferrer">
+              <div class="tool-top"><span class="tool-symbol">▦</span><span class="external">↗</span></div>
+              <div><span class="tool-kicker">СКЛАД И ПОСТАВКИ</span><h3>FBS Сканер</h3><p>Сканирование ШК и адресное хранение товара</p></div>
+              <span class="open-link">Открыть инструмент <b>→</b></span>
+            </a>
+            <button class="tool-card tool-violet" data-go="fbs">
+              <div class="tool-top"><span class="tool-symbol">▤</span><span class="external">→</span></div>
+              <div><span class="tool-kicker">GOOGLE ТАБЛИЦЫ</span><h3>Рабочие таблицы FBS</h3><p>Хранение, планирование перемещений и ежедневная работа</p></div>
+              <span class="open-link">Перейти к таблицам <b>→</b></span>
+            </button>
+            <button class="tool-card tool-dark" data-go="analytics">
+              <div class="tool-top"><span class="tool-symbol">✦</span><span class="external">→</span></div>
+              <div><span class="tool-kicker">УМНЫЙ ПОМОЩНИК</span><h3>Конструктор аналитики</h3><p>Соберите фотографии, выводы и таблицы в один отчёт</p></div>
+              <span class="open-link">Начать работу <b>→</b></span>
+            </button>
+          </div>
+
+          <div class="home-bottom">
+            <div class="recent-panel">
+              <div class="panel-head"><div><span class="eyebrow">ПОСЛЕДНИЕ ДОКУМЕНТЫ</span><h2>Недавняя работа</h2></div><button data-go="files">Все файлы →</button></div>
+              <div class="empty-recent" id="recentFiles"><span>□</span><div><strong>Здесь появятся ваши документы</strong><p>Создайте первый файл по шаблону или соберите аналитический отчёт.</p></div></div>
+            </div>
+            <div class="tip-panel"><span class="tip-icon">i</span><div><span class="eyebrow">БЫСТРАЯ ПОДСКАЗКА</span><h3>Начните с материала</h3><p>Загрузите фотографии и срезы — подписи и выводы можно добавить уже после.</p><button data-go="analytics">Перейти в аналитику →</button></div></div>
+          </div>
+        </section>
+
+        <section class="view" id="view-files">
+          <div class="page-heading compact-heading"><div><p class="eyebrow">ЛИЧНОЕ ПРОСТРАНСТВО</p><h1>Мои файлы</h1><p>Создавайте рабочие документы по готовой структуре. Всё сохраняется на этом устройстве.</p></div></div>
+          <div id="filesLibrary">
+            <div class="section-label"><h2>Создать по шаблону</h2><span>Выберите подходящую структуру</span></div>
+            <div class="template-grid">
+              <button class="template-card" data-template="note"><span class="template-icon blue">≡</span><div><h3>Рабочая заметка</h3><p>Мысли, задачи и важные детали</p></div><b>＋</b></button>
+              <button class="template-card" data-template="plan"><span class="template-icon violet">✓</span><div><h3>План действий</h3><p>Цель, шаги и ожидаемый результат</p></div><b>＋</b></button>
+              <button class="template-card" data-template="report"><span class="template-icon cyan">▤</span><div><h3>Краткий отчёт</h3><p>Ситуация, выводы и решения</p></div><b>＋</b></button>
+            </div>
+            <div class="files-toolbar"><div><h2>Все документы</h2><span id="filesSummary">Пока нет документов</span></div><label class="search-box"><span>⌕</span><input id="fileSearch" type="search" placeholder="Найти документ" /></label></div>
+            <div class="files-list" id="filesList"></div>
+          </div>
+          <div class="file-editor is-hidden" id="fileEditor">
+            <div class="editor-toolbar"><button class="ghost-button" id="closeEditor">← К списку</button><div><span id="editorSaved">Изменения сохраняются автоматически</span><button class="danger-text" id="deleteFile">Удалить</button></div></div>
+            <div class="document-paper"><input class="document-title" id="fileTitle" aria-label="Название документа" /><div class="document-meta" id="fileMeta"></div><textarea class="document-content" id="fileContent" aria-label="Содержание документа"></textarea></div>
+          </div>
+        </section>
+
+        <section class="view" id="view-analytics">
+          <div class="page-heading compact-heading analytics-heading"><div><p class="eyebrow">УМНЫЙ ПОМОЩНИК</p><h1>Конструктор аналитики</h1><p>Соберите факты, изображения и выводы — оформление отчёта произойдёт автоматически.</p></div><div class="step-status"><span>1</span><b>Материал</b><i></i><span>2</span><b>Отчёт</b></div></div>
+          <div class="analytics-layout">
+            <div class="composer">
+              <div class="composer-section">
+                <div class="composer-head"><span class="step-number">01</span><div><h2>Основа отчёта</h2><p>Задайте тему и кратко опишите ситуацию</p></div></div>
+                <div class="form-grid two"><label><span>Название аналитики</span><input id="reportTitle" placeholder="Например: Анализ выкладки за сентябрь" /></label><label><span>Период</span><input id="reportPeriod" placeholder="01–30 сентября 2026" /></label></div>
+                <label><span>Что мы видим</span><textarea id="reportObservation" rows="4" placeholder="Опишите ситуацию простыми словами: что изменилось, на что важно обратить внимание..."></textarea></label>
+              </div>
+              <div class="composer-section">
+                <div class="composer-head"><span class="step-number">02</span><div><h2>Фото и срезы</h2><p>Добавьте изображения и подпишите, что на них важно</p></div></div>
+                <label class="upload-zone" id="uploadZone"><input id="imageUpload" type="file" accept="image/*" multiple /><span class="upload-icon">＋</span><strong>Добавить изображения</strong><small>JPG, PNG или WEBP · можно выбрать несколько</small></label>
+                <div class="image-list" id="imageList"></div>
+              </div>
+              <div class="composer-section">
+                <div class="composer-head"><span class="step-number">03</span><div><h2>Таблица</h2><p>Зафиксируйте показатели или сравнение</p></div><button class="small-button" id="addRow">＋ Строка</button></div>
+                <div class="table-scroll"><table class="input-table"><thead><tr><th contenteditable="true">Показатель</th><th contenteditable="true">Было</th><th contenteditable="true">Стало</th></tr></thead><tbody id="analyticsTable"><tr><td contenteditable="true">Наименование</td><td contenteditable="true">—</td><td contenteditable="true">—</td></tr><tr><td contenteditable="true">Результат</td><td contenteditable="true">—</td><td contenteditable="true">—</td></tr></tbody></table></div>
+              </div>
+              <div class="composer-section">
+                <div class="composer-head"><span class="step-number">04</span><div><h2>Вывод и действия</h2><p>Сформулируйте главную мысль и следующий шаг</p></div></div>
+                <label><span>Основной вывод</span><textarea id="reportConclusion" rows="4" placeholder="Главный вывод по итогам анализа..."></textarea></label>
+                <label><span>Что предлагаем сделать</span><textarea id="reportActions" rows="4" placeholder="Перечислите понятные действия, каждое с новой строки..."></textarea></label>
+              </div>
+              <div class="composer-actions"><button class="ghost-button" id="saveDraft">Сохранить черновик</button><button class="primary-action" id="buildReport">✦ Сформировать аналитику</button></div>
+            </div>
+            <aside class="report-side">
+              <div class="preview-label"><span>ПРЕДПРОСМОТР</span><button id="resetReport">Очистить</button></div>
+              <div class="report-preview" id="reportPreview"></div>
+              <div class="export-panel"><div><strong>Отчёт готов к выгрузке</strong><span>PDF сохраняется через окно печати</span></div><div class="export-buttons"><button id="exportPdf">PDF</button><button id="exportWord">Word / Google Документы</button></div></div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="view" id="view-fbs">
+          <div class="page-heading compact-heading"><div><p class="eyebrow">РАБОЧИЕ ТАБЛИЦЫ</p><h1>FBS</h1><p>Прямой доступ к основным таблицам для хранения и планирования перемещений.</p></div><a class="primary-action link-button" href="https://docs.google.com/spreadsheets/d/11uwbxfXosJYZhhvdE2XSxU9wgYMv_jTW6oVlf1D_BBE/edit?gid=0#gid=0" target="_blank" rel="noreferrer">Открыть Google Таблицы ↗</a></div>
+          <div class="fbs-overview"><div class="fbs-number">FBS<span>/</span>02</div><div><span class="eyebrow">ЕДИНАЯ РАБОЧАЯ ЗОНА</span><h2>Две задачи — одна точка входа</h2><p>Обе карточки ведут в рабочую таблицу. Закладки открываются в новой вкладке, поэтому MyWorkspace остаётся доступен.</p></div></div>
+          <div class="sheet-grid">
+            <a class="sheet-card" href="https://docs.google.com/spreadsheets/d/11uwbxfXosJYZhhvdE2XSxU9wgYMv_jTW6oVlf1D_BBE/edit?gid=0#gid=0" target="_blank" rel="noreferrer"><span class="sheet-index">01</span><div class="sheet-icon">▦</div><div><span class="tool-kicker">УЧЁТ И ХРАНЕНИЕ</span><h3>Таблица хранения FBS</h3><p>Рабочее пространство для учёта товаров и адресного хранения.</p></div><span class="sheet-open">Открыть таблицу <b>↗</b></span></a>
+            <a class="sheet-card" href="https://docs.google.com/spreadsheets/d/11uwbxfXosJYZhhvdE2XSxU9wgYMv_jTW6oVlf1D_BBE/edit?gid=0#gid=0" target="_blank" rel="noreferrer"><span class="sheet-index">02</span><div class="sheet-icon violet">⇢</div><div><span class="tool-kicker">ПЛАНИРОВАНИЕ</span><h3>Таблица планирования перемещений</h3><p>Подготовка и контроль перемещений между зонами хранения.</p></div><span class="sheet-open">Открыть таблицу <b>↗</b></span></a>
+          </div>
+          <div class="fbs-note"><span>i</span><p><strong>Полезно знать</strong> Если для планирования появится отдельная ссылка или вкладка Google Таблицы, её можно заменить в одной карточке, не меняя весь раздел.</p></div>
+        </section>
+      </main>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

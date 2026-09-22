@@ -13,11 +13,11 @@ let profile = load(keys.profile, null);
 let tourIndex = 0;
 
 const tourSteps = [
-  { target: 'navigation', icon: '⌂', title: 'Всё под рукой', text: 'Слева находятся основные разделы: главная, ваши файлы, аналитика и рабочие таблицы FBS.' },
-  { target: 'quick-access', icon: '↗', title: 'Быстрый доступ', text: 'Отсюда открываются конвертер, сканер, Google Таблицы и конструктор аналитики.' },
-  { target: 'files', icon: '□', title: 'Мои файлы', text: 'Создавайте заметки, планы и отчёты по шаблонам. Они автоматически сохраняются в этом браузере.' },
-  { target: 'analytics', icon: '✦', title: 'Досье изделия', text: 'Здесь собирается полный путь товара: рынок, фотографии, примерки, экономика, запуск и готовый DOCX.' },
-  { target: 'fbs', icon: '▤', title: 'Рабочие таблицы FBS', text: 'Открывайте таблицы хранения и планирования перемещений, не теряя MyWorkspace.' }
+  { target: 'navigation', icon: 'home', title: 'Всё под рукой', text: 'Слева находятся основные разделы: главная, ваши файлы, аналитика и рабочие таблицы FBS.' },
+  { target: 'quick-access', icon: 'external', title: 'Быстрый доступ', text: 'Отсюда открываются конвертер, сканер, Google Таблицы и конструктор аналитики.' },
+  { target: 'files', icon: 'folder', title: 'Мои файлы', text: 'Создавайте заметки, планы и отчёты по шаблонам. Они автоматически сохраняются в этом браузере.' },
+  { target: 'analytics', icon: 'sparkles', title: 'Досье изделия', text: 'Здесь собирается полный путь товара: рынок, фотографии, примерки, экономика, запуск и готовый DOCX.' },
+  { target: 'fbs', icon: 'table', title: 'Рабочие таблицы FBS', text: 'Открывайте таблицы хранения и планирования перемещений, не теряя MyWorkspace.' }
 ];
 
 function load(key, fallback) {
@@ -31,6 +31,10 @@ function save(key, value) {
 
 function escapeHtml(value = '') {
   return String(value).replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[char]);
+}
+
+function svgIcon(name, className = '') {
+  return `<svg class="${className}" aria-hidden="true"><use href="#icon-${name}"/></svg>`;
 }
 
 function toast(message) {
@@ -99,7 +103,7 @@ function showTourStep(index) {
   if (step.target === 'navigation' && window.innerWidth <= 760) $('#sidebar').classList.add('is-open');
   target.scrollIntoView({ behavior: 'smooth', block: 'center' });
   $('#tourCounter').textContent = `${tourIndex + 1} из ${tourSteps.length}`;
-  $('#tourIcon').textContent = step.icon;
+  $('#tourIcon').innerHTML = svgIcon(step.icon);
   $('#tourTitle').textContent = step.title;
   $('#tourText').textContent = step.text;
   $('#prevTour').disabled = tourIndex === 0;
@@ -162,8 +166,8 @@ function renderFiles() {
   const visible = files.filter((file) => `${file.title} ${file.type}`.toLowerCase().includes(query));
   $('#filesSummary').textContent = files.length ? `${files.length} ${plural(files.length, ['документ', 'документа', 'документов'])}` : 'Пока нет документов';
   $('#filesList').innerHTML = visible.length
-    ? visible.map((file) => `<button class="file-row" data-file-id="${file.id}"><span>□</span><div><strong>${escapeHtml(file.title)}</strong><small>${escapeHtml(file.type)}</small></div><time>${formatDate(file.updatedAt)}</time></button>`).join('')
-    : `<div class="files-empty"><div><span>□</span><strong>${query ? 'Ничего не найдено' : 'Пока здесь пусто'}</strong><p>${query ? 'Попробуйте изменить запрос.' : 'Выберите шаблон выше, чтобы создать первый документ.'}</p></div></div>`;
+    ? visible.map((file) => `<button class="file-row" data-file-id="${file.id}"><span class="file-symbol">${svgIcon('note')}</span><div><strong>${escapeHtml(file.title)}</strong><small>${escapeHtml(file.type)}</small></div><time>${formatDate(file.updatedAt)}</time></button>`).join('')
+    : `<div class="files-empty"><div><span class="file-symbol">${svgIcon('folder')}</span><strong>${query ? 'Ничего не найдено' : 'Пока здесь пусто'}</strong><p>${query ? 'Попробуйте изменить запрос.' : 'Выберите шаблон выше, чтобы создать первый документ.'}</p></div></div>`;
   $$('[data-file-id]').forEach((button) => button.addEventListener('click', () => openFile(button.dataset.fileId)));
 }
 
@@ -210,11 +214,11 @@ function updateFileCounts() {
   $('#filesCount').textContent = files.length;
   if (!files.length) {
     $('#recentFiles').className = 'empty-recent';
-    $('#recentFiles').innerHTML = '<span>□</span><div><strong>Здесь появятся ваши документы</strong><p>Создайте первый файл по шаблону или соберите аналитический отчёт.</p></div>';
+    $('#recentFiles').innerHTML = `<span class="file-symbol">${svgIcon('folder')}</span><div><strong>Здесь появятся ваши документы</strong><p>Создайте первый файл по шаблону или соберите аналитический отчёт.</p></div>`;
     return;
   }
   $('#recentFiles').className = 'recent-mini-list';
-  $('#recentFiles').innerHTML = files.slice(0, 3).map((file) => `<button data-recent-id="${file.id}"><span>□</span><div><strong>${escapeHtml(file.title)}</strong><small>${formatDate(file.updatedAt)}</small></div><b>→</b></button>`).join('');
+  $('#recentFiles').innerHTML = files.slice(0, 3).map((file) => `<button data-recent-id="${file.id}"><span class="file-symbol">${svgIcon('note')}</span><div><strong>${escapeHtml(file.title)}</strong><small>${formatDate(file.updatedAt)}</small></div><b>${svgIcon('arrow')}</b></button>`).join('');
   $$('[data-recent-id]').forEach((button) => button.addEventListener('click', () => { switchView('files'); openFile(button.dataset.recentId); }));
 }
 

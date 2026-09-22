@@ -15,6 +15,21 @@
       <div class="welcome-line"></div>
     </div>
 
+    <svg class="icon-sprite" aria-hidden="true">
+      <symbol id="icon-home" viewBox="0 0 24 24"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></symbol>
+      <symbol id="icon-folder" viewBox="0 0 24 24"><path d="M3 6.5h6l2 2h10v10.5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><path d="M3 10h18"/></symbol>
+      <symbol id="icon-sparkles" viewBox="0 0 24 24"><path d="m12 3 1.2 3.8L17 8l-3.8 1.2L12 13l-1.2-3.8L7 8l3.8-1.2Z"/><path d="m18.5 14 .8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8Z"/><path d="m5 14 .7 1.8 1.8.7-1.8.7L5 19l-.7-1.8-1.8-.7 1.8-.7Z"/></symbol>
+      <symbol id="icon-table" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 9v11M15 9v11"/></symbol>
+      <symbol id="icon-convert" viewBox="0 0 24 24"><path d="M4 7h12M13 4l3 3-3 3"/><path d="M20 17H8m3 3-3-3 3-3"/><rect x="3" y="3" width="18" height="18" rx="3"/></symbol>
+      <symbol id="icon-scan" viewBox="0 0 24 24"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><path d="M7 9v6M10 8v8M13 9v6M17 8v8"/></symbol>
+      <symbol id="icon-chart" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20V7"/><path d="M2 20h20"/></symbol>
+      <symbol id="icon-note" viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6Z"/><path d="M14 3v5h5M9 12h7M9 16h7"/></symbol>
+      <symbol id="icon-checklist" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="m8 9 1.5 1.5L12 8M14 9h3M8 15l1.5 1.5L12 14M14 15h3"/></symbol>
+      <symbol id="icon-report" viewBox="0 0 24 24"><path d="M5 21V3h14v18Z"/><path d="M9 17v-4M12 17V9M15 17v-6"/></symbol>
+      <symbol id="icon-external" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9"/><path d="M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></symbol>
+      <symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M5 12h14M14 7l5 5-5 5"/></symbol>
+    </svg>
+
     <div class="app-shell">
       <aside class="sidebar" id="sidebar" data-tour="navigation">
         <div class="brand" aria-label="MyWorkspace">
@@ -23,10 +38,10 @@
         </div>
 
         <nav class="main-nav" aria-label="Основная навигация">
-          <button class="nav-item is-active" data-view="home"><span class="nav-icon">⌂</span><span>Главная</span></button>
-          <button class="nav-item" data-view="files"><span class="nav-icon">□</span><span>Мои файлы</span><span class="nav-count" id="filesCount">0</span></button>
-          <button class="nav-item" data-view="analytics"><span class="nav-icon">✦</span><span>Аналитика</span></button>
-          <button class="nav-item" data-view="fbs"><span class="nav-icon">↗</span><span>FBS · Таблицы</span></button>
+          <button class="nav-item is-active" data-view="home"><svg class="nav-icon"><use href="#icon-home"/></svg><span>Главная</span></button>
+          <button class="nav-item" data-view="files"><svg class="nav-icon"><use href="#icon-folder"/></svg><span>Мои файлы</span><span class="nav-count" id="filesCount">0</span></button>
+          <button class="nav-item" data-view="analytics"><svg class="nav-icon"><use href="#icon-sparkles"/></svg><span>Аналитика</span></button>
+          <button class="nav-item" data-view="fbs"><svg class="nav-icon"><use href="#icon-table"/></svg><span>FBS · Таблицы</span></button>
         </nav>
 
         <div class="sidebar-note">
@@ -53,31 +68,31 @@
           <div class="section-label"><h2>Быстрый доступ</h2><span>4 рабочих инструмента</span></div>
           <div class="quick-grid" data-tour="quick-access">
             <a class="tool-card tool-blue" href="https://golunovoleg111-rgb.github.io/FBS-CONVERTER/" target="_blank" rel="noreferrer">
-              <div class="tool-top"><span class="tool-symbol">⇄</span><span class="external">↗</span></div>
+              <div class="tool-top"><span class="tool-symbol"><svg><use href="#icon-convert"/></svg></span><span class="external"><svg><use href="#icon-external"/></svg></span></div>
               <div><span class="tool-kicker">ОБРАБОТКА ФАЙЛОВ</span><h3>FBS Конвертер</h3><p>Подготовка Excel к печати и выгрузка в PDF</p></div>
-              <span class="open-link">Открыть инструмент <b>→</b></span>
+              <span class="open-link">Открыть инструмент <svg><use href="#icon-arrow"/></svg></span>
             </a>
             <a class="tool-card tool-cyan" href="https://fbswb.tiovskiy.ru/" target="_blank" rel="noreferrer">
-              <div class="tool-top"><span class="tool-symbol">▦</span><span class="external">↗</span></div>
+              <div class="tool-top"><span class="tool-symbol"><svg><use href="#icon-scan"/></svg></span><span class="external"><svg><use href="#icon-external"/></svg></span></div>
               <div><span class="tool-kicker">СКЛАД И ПОСТАВКИ</span><h3>FBS Сканер</h3><p>Сканирование ШК и адресное хранение товара</p></div>
-              <span class="open-link">Открыть инструмент <b>→</b></span>
+              <span class="open-link">Открыть инструмент <svg><use href="#icon-arrow"/></svg></span>
             </a>
             <button class="tool-card tool-violet" data-go="fbs" data-tour="fbs">
-              <div class="tool-top"><span class="tool-symbol">▤</span><span class="external">→</span></div>
+              <div class="tool-top"><span class="tool-symbol"><svg><use href="#icon-table"/></svg></span><span class="external"><svg><use href="#icon-arrow"/></svg></span></div>
               <div><span class="tool-kicker">GOOGLE ТАБЛИЦЫ</span><h3>Рабочие таблицы FBS</h3><p>Хранение, планирование перемещений и ежедневная работа</p></div>
-              <span class="open-link">Перейти к таблицам <b>→</b></span>
+              <span class="open-link">Перейти к таблицам <svg><use href="#icon-arrow"/></svg></span>
             </button>
             <button class="tool-card tool-dark" data-go="analytics" data-tour="analytics">
-              <div class="tool-top"><span class="tool-symbol">✦</span><span class="external">→</span></div>
+              <div class="tool-top"><span class="tool-symbol"><svg><use href="#icon-chart"/></svg></span><span class="external"><svg><use href="#icon-arrow"/></svg></span></div>
               <div><span class="tool-kicker">УМНЫЙ ПОМОЩНИК</span><h3>Конструктор аналитики</h3><p>Соберите фотографии, выводы и таблицы в один отчёт</p></div>
-              <span class="open-link">Начать работу <b>→</b></span>
+              <span class="open-link">Начать работу <svg><use href="#icon-arrow"/></svg></span>
             </button>
           </div>
 
           <div class="home-bottom">
             <div class="recent-panel" data-tour="files">
               <div class="panel-head"><div><span class="eyebrow">ПОСЛЕДНИЕ ДОКУМЕНТЫ</span><h2>Недавняя работа</h2></div><button data-go="files">Все файлы →</button></div>
-              <div class="empty-recent" id="recentFiles"><span>□</span><div><strong>Здесь появятся ваши документы</strong><p>Создайте первый файл по шаблону или соберите аналитический отчёт.</p></div></div>
+              <div class="empty-recent" id="recentFiles"><span class="file-symbol"><svg><use href="#icon-folder"/></svg></span><div><strong>Здесь появятся ваши документы</strong><p>Создайте первый файл по шаблону или соберите аналитический отчёт.</p></div></div>
             </div>
             <div class="tip-panel"><span class="tip-icon">i</span><div><span class="eyebrow">БЫСТРАЯ ПОДСКАЗКА</span><h3>Начните с материала</h3><p>Загрузите фотографии и срезы — подписи и выводы можно добавить уже после.</p><button data-go="analytics">Перейти в аналитику →</button></div></div>
           </div>
@@ -88,9 +103,9 @@
           <div id="filesLibrary">
             <div class="section-label"><h2>Создать по шаблону</h2><span>Выберите подходящую структуру</span></div>
             <div class="template-grid">
-              <button class="template-card" data-template="note"><span class="template-icon blue">≡</span><div><h3>Рабочая заметка</h3><p>Мысли, задачи и важные детали</p></div><b>＋</b></button>
-              <button class="template-card" data-template="plan"><span class="template-icon violet">✓</span><div><h3>План действий</h3><p>Цель, шаги и ожидаемый результат</p></div><b>＋</b></button>
-              <button class="template-card" data-template="report"><span class="template-icon cyan">▤</span><div><h3>Краткий отчёт</h3><p>Ситуация, выводы и решения</p></div><b>＋</b></button>
+              <button class="template-card" data-template="note"><span class="template-icon blue"><svg><use href="#icon-note"/></svg></span><div><h3>Рабочая заметка</h3><p>Мысли, задачи и важные детали</p></div><b>＋</b></button>
+              <button class="template-card" data-template="plan"><span class="template-icon violet"><svg><use href="#icon-checklist"/></svg></span><div><h3>План действий</h3><p>Цель, шаги и ожидаемый результат</p></div><b>＋</b></button>
+              <button class="template-card" data-template="report"><span class="template-icon cyan"><svg><use href="#icon-report"/></svg></span><div><h3>Краткий отчёт</h3><p>Ситуация, выводы и решения</p></div><b>＋</b></button>
             </div>
             <div class="files-toolbar"><div><h2>Все документы</h2><span id="filesSummary">Пока нет документов</span></div><label class="search-box"><span>⌕</span><input id="fileSearch" type="search" placeholder="Найти документ" /></label></div>
             <div class="files-list" id="filesList"></div>
@@ -189,8 +204,8 @@
           <div class="page-heading compact-heading"><div><p class="eyebrow">РАБОЧИЕ ТАБЛИЦЫ</p><h1>FBS</h1><p>Прямой доступ к основным таблицам для хранения и планирования перемещений.</p></div><a class="primary-action link-button" href="https://docs.google.com/spreadsheets/d/11uwbxfXosJYZhhvdE2XSxU9wgYMv_jTW6oVlf1D_BBE/edit?gid=0#gid=0" target="_blank" rel="noreferrer">Открыть Google Таблицы ↗</a></div>
           <div class="fbs-overview"><div class="fbs-number">FBS<span>/</span>02</div><div><span class="eyebrow">ЕДИНАЯ РАБОЧАЯ ЗОНА</span><h2>Две задачи — одна точка входа</h2><p>Обе карточки ведут в рабочую таблицу. Закладки открываются в новой вкладке, поэтому MyWorkspace остаётся доступен.</p></div></div>
           <div class="sheet-grid">
-            <a class="sheet-card" href="https://docs.google.com/spreadsheets/d/11uwbxfXosJYZhhvdE2XSxU9wgYMv_jTW6oVlf1D_BBE/edit?gid=0#gid=0" target="_blank" rel="noreferrer"><span class="sheet-index">01</span><div class="sheet-icon">▦</div><div><span class="tool-kicker">УЧЁТ И ХРАНЕНИЕ</span><h3>Таблица хранения FBS</h3><p>Рабочее пространство для учёта товаров и адресного хранения.</p></div><span class="sheet-open">Открыть таблицу <b>↗</b></span></a>
-            <a class="sheet-card" href="https://docs.google.com/spreadsheets/d/11uwbxfXosJYZhhvdE2XSxU9wgYMv_jTW6oVlf1D_BBE/edit?gid=0#gid=0" target="_blank" rel="noreferrer"><span class="sheet-index">02</span><div class="sheet-icon violet">⇢</div><div><span class="tool-kicker">ПЛАНИРОВАНИЕ</span><h3>Таблица планирования перемещений</h3><p>Подготовка и контроль перемещений между зонами хранения.</p></div><span class="sheet-open">Открыть таблицу <b>↗</b></span></a>
+            <a class="sheet-card" href="https://docs.google.com/spreadsheets/d/11uwbxfXosJYZhhvdE2XSxU9wgYMv_jTW6oVlf1D_BBE/edit?gid=0#gid=0" target="_blank" rel="noreferrer"><span class="sheet-index">01</span><div class="sheet-icon"><svg><use href="#icon-table"/></svg></div><div><span class="tool-kicker">УЧЁТ И ХРАНЕНИЕ</span><h3>Таблица хранения FBS</h3><p>Рабочее пространство для учёта товаров и адресного хранения.</p></div><span class="sheet-open">Открыть таблицу <svg><use href="#icon-external"/></svg></span></a>
+            <a class="sheet-card" href="https://docs.google.com/spreadsheets/d/11uwbxfXosJYZhhvdE2XSxU9wgYMv_jTW6oVlf1D_BBE/edit?gid=0#gid=0" target="_blank" rel="noreferrer"><span class="sheet-index">02</span><div class="sheet-icon violet"><svg><use href="#icon-convert"/></svg></div><div><span class="tool-kicker">ПЛАНИРОВАНИЕ</span><h3>Таблица планирования перемещений</h3><p>Подготовка и контроль перемещений между зонами хранения.</p></div><span class="sheet-open">Открыть таблицу <svg><use href="#icon-external"/></svg></span></a>
           </div>
           <div class="fbs-note"><span>i</span><p><strong>Полезно знать</strong> Если для планирования появится отдельная ссылка или вкладка Google Таблицы, её можно заменить в одной карточке, не меняя весь раздел.</p></div>
         </section>

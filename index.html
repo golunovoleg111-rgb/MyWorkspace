@@ -23,6 +23,7 @@
       <symbol id="icon-convert" viewBox="0 0 24 24"><path d="M4 7h12M13 4l3 3-3 3"/><path d="M20 17H8m3 3-3-3 3-3"/><rect x="3" y="3" width="18" height="18" rx="3"/></symbol>
       <symbol id="icon-scan" viewBox="0 0 24 24"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><path d="M7 9v6M10 8v8M13 9v6M17 8v8"/></symbol>
       <symbol id="icon-chart" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20V7"/><path d="M2 20h20"/></symbol>
+      <symbol id="icon-store-analysis" viewBox="0 0 24 24"><path d="M3 20h18M5 17l4-4 3 2 6-7"/><path d="m15 8 3-.5.5 3"/><circle cx="8" cy="7" r="3"/><path d="M6 7h4M8 5v4"/></symbol>
       <symbol id="icon-note" viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6Z"/><path d="M14 3v5h5M9 12h7M9 16h7"/></symbol>
       <symbol id="icon-checklist" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="m8 9 1.5 1.5L12 8M14 9h3M8 15l1.5 1.5L12 14M14 15h3"/></symbol>
       <symbol id="icon-report" viewBox="0 0 24 24"><path d="M5 21V3h14v18Z"/><path d="M9 17v-4M12 17V9M15 17v-6"/></symbol>
@@ -41,6 +42,7 @@
           <button class="nav-item is-active" data-view="home"><svg class="nav-icon"><use href="#icon-home"/></svg><span>Главная</span></button>
           <button class="nav-item" data-view="files"><svg class="nav-icon"><use href="#icon-folder"/></svg><span>Мои файлы</span><span class="nav-count" id="filesCount">0</span></button>
           <button class="nav-item" data-view="analytics"><svg class="nav-icon"><use href="#icon-sparkles"/></svg><span>Аналитика</span></button>
+          <button class="nav-item" data-view="store"><svg class="nav-icon"><use href="#icon-store-analysis"/></svg><span>Анализ магазина</span></button>
           <button class="nav-item" data-view="fbs"><svg class="nav-icon"><use href="#icon-table"/></svg><span>FBS · Таблицы</span></button>
         </nav>
 
@@ -65,7 +67,7 @@
             <button class="primary-action" data-go="analytics"><span>＋</span> Создать аналитику</button>
           </div>
 
-          <div class="section-label"><h2>Быстрый доступ</h2><span>4 рабочих инструмента</span></div>
+          <div class="section-label"><h2>Быстрый доступ</h2><span>5 рабочих инструментов</span></div>
           <div class="quick-grid" data-tour="quick-access">
             <a class="tool-card tool-blue" href="https://golunovoleg111-rgb.github.io/FBS-CONVERTER/" target="_blank" rel="noreferrer">
               <div class="tool-top"><span class="tool-symbol"><svg><use href="#icon-convert"/></svg></span><span class="external"><svg><use href="#icon-external"/></svg></span></div>
@@ -86,6 +88,11 @@
               <div class="tool-top"><span class="tool-symbol"><svg><use href="#icon-chart"/></svg></span><span class="external"><svg><use href="#icon-arrow"/></svg></span></div>
               <div><span class="tool-kicker">УМНЫЙ ПОМОЩНИК</span><h3>Конструктор аналитики</h3><p>Соберите фотографии, выводы и таблицы в один отчёт</p></div>
               <span class="open-link">Начать работу <svg><use href="#icon-arrow"/></svg></span>
+            </button>
+            <button class="tool-card tool-store" data-go="store" data-tour="store-analysis">
+              <div class="tool-top"><span class="tool-symbol"><svg><use href="#icon-store-analysis"/></svg></span><span class="external"><svg><use href="#icon-arrow"/></svg></span></div>
+              <div><span class="tool-kicker">АНАЛИТИКА WB</span><h3>Анализ магазина</h3><p>Причины роста и снижения заказов по каждому товару</p></div>
+              <span class="open-link">Загрузить отчёты <svg><use href="#icon-arrow"/></svg></span>
             </button>
           </div>
 
@@ -200,14 +207,40 @@
           </div>
         </section>
 
+        <section class="view" id="view-store">
+          <div class="page-heading compact-heading store-heading">
+            <div><p class="eyebrow">УМНЫЙ ПОМОЩНИК WB</p><h1>Анализ магазина</h1><p>Загрузите отчёты Wildberries. Помощник сопоставит продажи, поиск и остатки и покажет историю каждого товара.</p></div>
+            <div class="local-data-badge"><span></span><div><strong>Данные не покидают браузер</strong><small>Файлы обрабатываются только на этом устройстве</small></div></div>
+          </div>
+
+          <div class="store-setup" id="storeSetup">
+            <section class="store-upload-card">
+              <div class="store-upload-copy"><span class="eyebrow">ИСТОЧНИКИ</span><h2>Добавьте отчёты</h2><p>Можно выбрать все пять файлов сразу. XLSX и ZIP распознаются автоматически.</p></div>
+              <label class="store-dropzone" id="storeDropzone"><input id="storeUpload" type="file" accept=".xlsx,.XLSX,.zip" multiple /><span class="dropzone-icon"><svg><use href="#icon-store-analysis"/></svg></span><strong>Перетащите файлы сюда</strong><small>или нажмите, чтобы выбрать отчёты</small><b>XLSX · ZIP</b></label>
+              <div class="source-files" id="storeFileList"></div>
+              <div class="store-upload-actions"><button class="ghost-button" id="resetStoreAnalysis" type="button">Очистить</button><button class="primary-action" id="runStoreAnalysis" type="button" disabled>Сформировать анализ</button></div>
+              <div class="store-processing is-hidden" id="storeProcessing"><span></span><div><strong>Собираю картину магазина</strong><small>Сопоставляю периоды, товары и поисковую воронку</small></div></div>
+              <div class="source-warning is-hidden" id="storeError"></div>
+            </section>
+            <aside class="source-guide">
+              <span class="eyebrow">ЧТО ЗАГРУЖАТЬ</span>
+              <div><b>01</b><span><strong>Еженедельная динамика</strong><small>Заказы, выкупы и сумма по дням · 7–30 дней</small></span></div>
+              <div><b>02</b><span><strong>Текущие остатки</strong><small>Остаток каждого размера по артикулу</small></span></div>
+              <div><b>03</b><span><strong>Аналитика поиска</strong><small>Неделя, месяц и квартал к предыдущему периоду</small></span></div>
+              <p><strong>Чем больше источников, тем точнее вывод.</strong> Если показателя нет в файлах, помощник не будет придумывать причину.</p>
+            </aside>
+          </div>
+          <div class="store-results is-hidden" id="storeResults"></div>
+        </section>
+
         <section class="view" id="view-fbs">
           <div class="page-heading compact-heading"><div><p class="eyebrow">РАБОЧИЕ ТАБЛИЦЫ</p><h1>FBS</h1><p>Прямой доступ к основным таблицам для хранения и планирования перемещений.</p></div><a class="primary-action link-button" href="https://docs.google.com/spreadsheets/d/11uwbxfXosJYZhhvdE2XSxU9wgYMv_jTW6oVlf1D_BBE/edit?gid=0#gid=0" target="_blank" rel="noreferrer">Открыть Google Таблицы ↗</a></div>
-          <div class="fbs-overview"><div class="fbs-number">FBS<span>/</span>02</div><div><span class="eyebrow">ЕДИНАЯ РАБОЧАЯ ЗОНА</span><h2>Две задачи — одна точка входа</h2><p>Обе карточки ведут в рабочую таблицу. Закладки открываются в новой вкладке, поэтому MyWorkspace остаётся доступен.</p></div></div>
+          <div class="fbs-overview"><div class="fbs-number">FBS<span>/</span>02</div><div><span class="eyebrow">ЕДИНАЯ РАБОЧАЯ ЗОНА</span><h2>Две задачи — одна точка входа</h2><p>Каждая карточка ведёт в свою рабочую таблицу. Они открываются в новой вкладке, поэтому MyWorkspace остаётся доступен.</p></div></div>
           <div class="sheet-grid">
             <a class="sheet-card" href="https://docs.google.com/spreadsheets/d/11uwbxfXosJYZhhvdE2XSxU9wgYMv_jTW6oVlf1D_BBE/edit?gid=0#gid=0" target="_blank" rel="noreferrer"><span class="sheet-index">01</span><div class="sheet-icon"><svg><use href="#icon-table"/></svg></div><div><span class="tool-kicker">УЧЁТ И ХРАНЕНИЕ</span><h3>Таблица хранения FBS</h3><p>Рабочее пространство для учёта товаров и адресного хранения.</p></div><span class="sheet-open">Открыть таблицу <svg><use href="#icon-external"/></svg></span></a>
-            <a class="sheet-card" href="https://docs.google.com/spreadsheets/d/11uwbxfXosJYZhhvdE2XSxU9wgYMv_jTW6oVlf1D_BBE/edit?gid=0#gid=0" target="_blank" rel="noreferrer"><span class="sheet-index">02</span><div class="sheet-icon violet"><svg><use href="#icon-convert"/></svg></div><div><span class="tool-kicker">ПЛАНИРОВАНИЕ</span><h3>Таблица планирования перемещений</h3><p>Подготовка и контроль перемещений между зонами хранения.</p></div><span class="sheet-open">Открыть таблицу <svg><use href="#icon-external"/></svg></span></a>
+            <a class="sheet-card" href="https://docs.google.com/spreadsheets/d/1xzmsRY0EJ8xUCMO925pe2lJJOYjqAQdjcTYx-Sl2Yus/edit?usp=drive_link" target="_blank" rel="noreferrer"><span class="sheet-index">02</span><div class="sheet-icon violet"><svg><use href="#icon-convert"/></svg></div><div><span class="tool-kicker">ПЛАНИРОВАНИЕ</span><h3>Таблица планирования перемещений</h3><p>Подготовка и контроль перемещений между зонами хранения.</p></div><span class="sheet-open">Открыть таблицу <svg><use href="#icon-external"/></svg></span></a>
           </div>
-          <div class="fbs-note"><span>i</span><p><strong>Полезно знать</strong> Если для планирования появится отдельная ссылка или вкладка Google Таблицы, её можно заменить в одной карточке, не меняя весь раздел.</p></div>
+          <div class="fbs-note"><span>i</span><p><strong>Полезно знать</strong> Первая карточка открывает хранение FBS, вторая — отдельную таблицу планирования перемещений.</p></div>
         </section>
       </main>
     </div>

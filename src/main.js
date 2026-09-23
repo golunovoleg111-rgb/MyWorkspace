@@ -1,9 +1,10 @@
 import './styles.css';
 import { exportAnalyticsDocx } from './docx-export.js';
+import { initStoreAnalysis } from './store-ui.js';
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
-const sections = { home: 'Главная', files: 'Мои файлы', analytics: 'Аналитика', fbs: 'FBS · Таблицы' };
+const sections = { home: 'Главная', files: 'Мои файлы', analytics: 'Аналитика', store: 'Анализ магазина', fbs: 'FBS · Таблицы' };
 const keys = { files: 'myworkspace.files.v1', draft: 'myworkspace.analytics.v1', profile: 'myworkspace.profile.v1', tour: 'myworkspace.tour.v1' };
 let files = load(keys.files, []);
 let activeFileId = null;
@@ -13,10 +14,11 @@ let profile = load(keys.profile, null);
 let tourIndex = 0;
 
 const tourSteps = [
-  { target: 'navigation', icon: 'home', title: 'Всё под рукой', text: 'Слева находятся основные разделы: главная, ваши файлы, аналитика и рабочие таблицы FBS.' },
-  { target: 'quick-access', icon: 'external', title: 'Быстрый доступ', text: 'Отсюда открываются конвертер, сканер, Google Таблицы и конструктор аналитики.' },
+  { target: 'navigation', icon: 'home', title: 'Всё под рукой', text: 'Слева находятся основные разделы: файлы, разработка товара, анализ магазина и рабочие таблицы FBS.' },
+  { target: 'quick-access', icon: 'external', title: 'Быстрый доступ', text: 'Отсюда открываются конвертер, сканер, Google Таблицы и два умных помощника.' },
   { target: 'files', icon: 'folder', title: 'Мои файлы', text: 'Создавайте заметки, планы и отчёты по шаблонам. Они автоматически сохраняются в этом браузере.' },
   { target: 'analytics', icon: 'sparkles', title: 'Досье изделия', text: 'Здесь собирается полный путь товара: рынок, фотографии, примерки, экономика, запуск и готовый DOCX.' },
+  { target: 'store-analysis', icon: 'store-analysis', title: 'Анализ магазина', text: 'Загрузите отчёты WB, чтобы увидеть динамику магазина и причины изменений по каждому товару.' },
   { target: 'fbs', icon: 'table', title: 'Рабочие таблицы FBS', text: 'Открывайте таблицы хранения и планирования перемещений, не теряя MyWorkspace.' }
 ];
 
@@ -380,7 +382,7 @@ function registerWebMcp() {
   if (!navigator.modelContext?.registerTool) return;
   navigator.modelContext.registerTool({
     name: 'open_workspace_section', description: 'Открывает раздел MyWorkspace',
-    inputSchema: { type: 'object', properties: { section: { type: 'string', enum: ['home', 'files', 'analytics', 'fbs'] } }, required: ['section'] },
+    inputSchema: { type: 'object', properties: { section: { type: 'string', enum: ['home', 'files', 'analytics', 'store', 'fbs'] } }, required: ['section'] },
     execute: ({ section }) => { switchView(section); return { content: [{ type: 'text', text: `Открыт раздел ${sections[section]}` }] }; }
   });
 }
@@ -434,7 +436,7 @@ $('#exportPdf').addEventListener('click', () => { buildReport(false); window.pri
 
 $('#today').textContent = new Intl.DateTimeFormat('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date());
 $('#reportPreview').innerHTML = reportMarkup(reportData());
-updateFileCounts(); renderFiles(); loadDraft(); updateProgress(); updateProfileUi(); registerWebMcp();
+updateFileCounts(); renderFiles(); loadDraft(); updateProgress(); updateProfileUi(); initStoreAnalysis(); registerWebMcp();
 window.setTimeout(() => {
   $('#welcome')?.remove();
   if (!profile) openProfileModal(false);

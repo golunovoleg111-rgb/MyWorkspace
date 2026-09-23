@@ -24,6 +24,12 @@
       <symbol id="icon-scan" viewBox="0 0 24 24"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><path d="M7 9v6M10 8v8M13 9v6M17 8v8"/></symbol>
       <symbol id="icon-chart" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20V7"/><path d="M2 20h20"/></symbol>
       <symbol id="icon-store-analysis" viewBox="0 0 24 24"><path d="M3 20h18M5 17l4-4 3 2 6-7"/><path d="m15 8 3-.5.5 3"/><circle cx="8" cy="7" r="3"/><path d="M6 7h4M8 5v4"/></symbol>
+      <symbol id="icon-product" viewBox="0 0 24 24"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9Z"/><path d="m4 7.5 8 4.5 8-4.5M12 12v9M8 5.2l8 4.5"/></symbol>
+      <symbol id="icon-history" viewBox="0 0 24 24"><path d="M4 7v5h5"/><path d="M5.5 16a8 8 0 1 0 .3-8.5L4 10"/><path d="M12 7v5l3 2"/></symbol>
+      <symbol id="icon-stock" viewBox="0 0 24 24"><path d="M4 8h16v12H4Z"/><path d="M3 4h18v4H3ZM9 12h6"/></symbol>
+      <symbol id="icon-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></symbol>
+      <symbol id="icon-finance" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15 8.5c-.7-.6-1.7-1-3-1-1.7 0-3 .8-3 2s1.1 1.8 3 2.2 3 1 3 2.3-1.3 2.5-3 2.5c-1.2 0-2.4-.4-3.2-1.1M12 5.5v13"/></symbol>
+      <symbol id="icon-knowledge" viewBox="0 0 24 24"><path d="M4 5.5A3.5 3.5 0 0 1 7.5 2H12v18H7.5A3.5 3.5 0 0 0 4 23Z"/><path d="M20 5.5A3.5 3.5 0 0 0 16.5 2H12v18h4.5A3.5 3.5 0 0 1 20 23Z"/></symbol>
       <symbol id="icon-note" viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6Z"/><path d="M14 3v5h5M9 12h7M9 16h7"/></symbol>
       <symbol id="icon-checklist" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="m8 9 1.5 1.5L12 8M14 9h3M8 15l1.5 1.5L12 14M14 15h3"/></symbol>
       <symbol id="icon-report" viewBox="0 0 24 24"><path d="M5 21V3h14v18Z"/><path d="M9 17v-4M12 17V9M15 17v-6"/></symbol>
@@ -40,9 +46,17 @@
 
         <nav class="main-nav" aria-label="Основная навигация">
           <button class="nav-item is-active" data-view="home"><svg class="nav-icon"><use href="#icon-home"/></svg><span>Главная</span></button>
+          <span class="nav-group-label">РАБОЧЕЕ ПРОСТРАНСТВО</span>
           <button class="nav-item" data-view="files"><svg class="nav-icon"><use href="#icon-folder"/></svg><span>Мои файлы</span><span class="nav-count" id="filesCount">0</span></button>
+          <button class="nav-item" data-view="products"><svg class="nav-icon"><use href="#icon-product"/></svg><span>Карточки товаров</span><span class="nav-count" id="productsCount">0</span></button>
           <button class="nav-item" data-view="analytics"><svg class="nav-icon"><use href="#icon-sparkles"/></svg><span>Аналитика</span></button>
           <button class="nav-item" data-view="store"><svg class="nav-icon"><use href="#icon-store-analysis"/></svg><span>Анализ магазина</span></button>
+          <button class="nav-item" data-view="history"><svg class="nav-icon"><use href="#icon-history"/></svg><span>История анализов</span></button>
+          <button class="nav-item" data-view="stock"><svg class="nav-icon"><use href="#icon-stock"/></svg><span>Контроль остатков</span></button>
+          <span class="nav-group-label">УПРАВЛЕНИЕ</span>
+          <button class="nav-item" data-view="calendar"><svg class="nav-icon"><use href="#icon-calendar"/></svg><span>Календарь</span><span class="nav-count" id="calendarCount">0</span></button>
+          <button class="nav-item" data-view="finance"><svg class="nav-icon"><use href="#icon-finance"/></svg><span>Финансы товара</span></button>
+          <button class="nav-item" data-view="knowledge"><svg class="nav-icon"><use href="#icon-knowledge"/></svg><span>База знаний</span></button>
           <button class="nav-item" data-view="fbs"><svg class="nav-icon"><use href="#icon-table"/></svg><span>FBS · Таблицы</span></button>
         </nav>
 
@@ -51,7 +65,7 @@
           <div><strong>Всё работает локально</strong><p>Данные остаются на этом устройстве</p></div>
         </div>
         <button class="tour-restart" id="restartTour"><span>?</span><div><strong>Обучение</strong><small>Повторить подсказки</small></div></button>
-        <div class="sidebar-footer">v1.1 · личное пространство</div>
+        <div class="sidebar-footer">v1.2 · личное пространство</div>
       </aside>
 
       <main class="workspace">
@@ -233,6 +247,36 @@
           <div class="store-results is-hidden" id="storeResults"></div>
         </section>
 
+        <section class="view" id="view-products">
+          <div class="page-heading compact-heading module-heading"><div><p class="eyebrow">ЕДИНЫЙ КАТАЛОГ</p><h1>Карточки товаров</h1><p>Паспорт артикула, текущее состояние, связанные анализы и рабочие заметки.</p></div><button class="primary-action" id="addProduct">＋ Добавить товар</button></div>
+          <div id="productsWorkspace"></div>
+        </section>
+
+        <section class="view" id="view-history">
+          <div class="page-heading compact-heading module-heading"><div><p class="eyebrow">ДИНАМИКА РЕШЕНИЙ</p><h1>История анализов</h1><p>Сохранённые срезы магазина и изменения показателей между проверками.</p></div><button class="ghost-button" id="exportHistory">Выгрузить историю</button></div>
+          <div id="historyWorkspace"></div>
+        </section>
+
+        <section class="view" id="view-stock">
+          <div class="page-heading compact-heading module-heading"><div><p class="eyebrow">ДОСТУПНОСТЬ ТОВАРОВ</p><h1>Контроль остатков</h1><p>Нулевые размеры, критический запас и избыточные остатки по последнему анализу.</p></div><button class="ghost-button" id="exportStock">Выгрузить CSV</button></div>
+          <div id="stockWorkspace"></div>
+        </section>
+
+        <section class="view" id="view-calendar">
+          <div class="page-heading compact-heading module-heading"><div><p class="eyebrow">СРОКИ И СОБЫТИЯ</p><h1>Календарь магазина</h1><p>Поставки, примерки, запуски, повторные анализы и контрольные даты.</p></div><button class="primary-action" id="addCalendarEvent">＋ Добавить событие</button></div>
+          <div id="calendarWorkspace"></div>
+        </section>
+
+        <section class="view" id="view-finance">
+          <div class="page-heading compact-heading module-heading"><div><p class="eyebrow">ЭКОНОМИКА ЕДИНИЦЫ</p><h1>Финансы товара</h1><p>Прибыль, маржинальность, рентабельность и минимальная цена без сложных таблиц.</p></div></div>
+          <div id="financeWorkspace"></div>
+        </section>
+
+        <section class="view" id="view-knowledge">
+          <div class="page-heading compact-heading module-heading"><div><p class="eyebrow">ИНСТРУКЦИИ И ШАБЛОНЫ</p><h1>База знаний</h1><p>Рабочие регламенты, чек-листы и собственные инструкции в одном месте.</p></div><button class="primary-action" id="addKnowledge">＋ Новая инструкция</button></div>
+          <div id="knowledgeWorkspace"></div>
+        </section>
+
         <section class="view" id="view-fbs">
           <div class="page-heading compact-heading"><div><p class="eyebrow">РАБОЧИЕ ТАБЛИЦЫ</p><h1>FBS</h1><p>Прямой доступ к основным таблицам для хранения и планирования перемещений.</p></div><a class="primary-action link-button" href="https://docs.google.com/spreadsheets/d/11uwbxfXosJYZhhvdE2XSxU9wgYMv_jTW6oVlf1D_BBE/edit?gid=0#gid=0" target="_blank" rel="noreferrer">Открыть Google Таблицы ↗</a></div>
           <div class="fbs-overview"><div class="fbs-number">FBS<span>/</span>02</div><div><span class="eyebrow">ЕДИНАЯ РАБОЧАЯ ЗОНА</span><h2>Две задачи — одна точка входа</h2><p>Каждая карточка ведёт в свою рабочую таблицу. Они открываются в новой вкладке, поэтому MyWorkspace остаётся доступен.</p></div></div>
@@ -266,6 +310,7 @@
       </div>
     </div>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <div class="module-modal is-hidden" id="moduleModal" role="dialog" aria-modal="true" aria-labelledby="moduleModalTitle"><div class="module-dialog"><div class="module-dialog-head"><div><span class="eyebrow" id="moduleModalEyebrow">MYWORKSPACE</span><h2 id="moduleModalTitle">Редактирование</h2></div><button type="button" id="closeModuleModal" aria-label="Закрыть">×</button></div><div id="moduleModalBody"></div></div></div>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

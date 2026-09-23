@@ -133,6 +133,7 @@ function renderAnalysis(analysis, errors = []) {
     productMode = button.dataset.productMode; root.querySelectorAll('[data-product-mode]').forEach((item) => item.classList.toggle('is-active', item === button)); $('#storeProducts').innerHTML = productRows(analysis);
   }));
   $('#storeProductSearch').addEventListener('input', () => { $('#storeProducts').innerHTML = productRows(analysis); });
+  window.dispatchEvent(new CustomEvent('myworkspace:analysis-complete', { detail: analysis }));
 }
 
 async function runAnalysis() {

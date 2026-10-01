@@ -2,6 +2,7 @@ import './styles.css';
 import { exportAnalyticsDocx } from './docx-export.js';
 import { initStoreAnalysis } from './store-ui.js';
 import { initWorkspaceModules, renderWorkspaceModule } from './workspace-modules.js';
+import { initPetCompanion } from './pet.js';
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -134,6 +135,7 @@ function switchView(name) {
   $('#sidebar').classList.remove('is-open');
   if (name === 'files') renderFiles();
   renderWorkspaceModule(name);
+  document.dispatchEvent(new CustomEvent('myworkspace:view-change', { detail: { name } }));
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -501,7 +503,7 @@ $('#exportPdf').addEventListener('click', () => { buildReport(false); window.pri
 
 $('#today').textContent = new Intl.DateTimeFormat('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date());
 $('#reportPreview').innerHTML = reportMarkup(reportData()); updateRevenueSummary();
-updateFileCounts(); renderFiles(); loadDraft(); updateProgress(); updateProfileUi(); initStoreAnalysis(); initWorkspaceModules({ toast, switchView }); registerWebMcp();
+updateFileCounts(); renderFiles(); loadDraft(); updateProgress(); updateProfileUi(); initStoreAnalysis(); initWorkspaceModules({ toast, switchView }); initPetCompanion({ toast }); registerWebMcp();
 window.setTimeout(() => {
   $('#welcome')?.remove();
   if (!profile) openProfileModal(false);

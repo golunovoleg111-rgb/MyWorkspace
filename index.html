@@ -67,7 +67,7 @@
           <div><strong>Всё работает локально</strong><p>Данные остаются на этом устройстве</p></div>
         </div>
         <button class="tour-restart" id="restartTour"><span>?</span><div><strong>Обучение</strong><small>Повторить подсказки</small></div></button>
-        <div class="sidebar-footer">v2.0 · Living Space</div>
+        <div class="sidebar-footer">v2.1 · Bond & Play</div>
       </aside>
 
       <main class="workspace">
@@ -311,13 +311,27 @@
                 <span class="rest-avatar">✦</span><div><small id="restPetMood">РАД ВАС ВИДЕТЬ</small><strong id="restPetName">Ваш друг</strong><p id="restPetState">Исследует комнату</p></div>
               </div>
               <div class="rest-scene-hint" id="restSceneHint"><span>↗</span><p><strong>Комната интерактивна</strong>Нажимайте на мяч, миску, лежанку, окно и светильник.</p></div>
+              <div class="rest-game-hud" id="restGameHud" aria-live="polite">
+                <div><span>СВЕТОВОЙ СЛЕД</span><strong id="restGameScore">000</strong></div>
+                <div class="rest-game-combo"><small>СЕРИЯ</small><b id="restGameCombo">×1</b></div>
+                <div class="rest-game-timer"><i id="restGameTimerRing"></i><b id="restGameTimer">30</b></div>
+                <button type="button" id="restGameExit" aria-label="Завершить игру">×</button>
+              </div>
               <div class="rest-action-dock" aria-label="Действия с питомцем">
                 <button type="button" data-rest-action="call"><span>♡</span><b>Позвать</b></button>
                 <button type="button" data-rest-action="ball"><span>●</span><b>Бросить мяч</b></button>
                 <button type="button" data-rest-action="feed"><span>◒</span><b>Угостить</b></button>
                 <button type="button" data-rest-action="paw"><span>♧</span><b>Дать лапу</b></button>
+                <button type="button" data-rest-action="game"><span>✦</span><b>Играть</b></button>
+                <button type="button" data-rest-action="talk"><span>···</span><b>Поговорить</b></button>
                 <button type="button" data-rest-action="sleep"><span>☾</span><b>Отдых</b></button>
               </div>
+              <section class="rest-dialog" id="restDialog" aria-label="Разговор с питомцем" aria-hidden="true">
+                <header><div class="rest-dialog-avatar">✦</div><div><small>РЯДОМ С ВАМИ</small><strong id="restDialogName">Ваш друг</strong></div><button type="button" id="restDialogClose" aria-label="Закрыть разговор">×</button></header>
+                <div class="rest-dialog-messages" id="restDialogMessages"></div>
+                <div class="rest-dialog-topics" aria-label="Темы разговора"><button type="button" data-rest-topic="support">Нужен совет</button><button type="button" data-rest-topic="story">Расскажи историю</button><button type="button" data-rest-topic="break">Давай отдохнём</button></div>
+                <form id="restDialogForm"><input id="restDialogInput" maxlength="180" autocomplete="off" placeholder="Напишите что-нибудь…"><button type="submit" aria-label="Отправить">→</button></form>
+              </section>
               <div class="rest-loading" id="restLoading"><span></span><strong>Создаём пространство</strong><small>Свет · материалы · анимации</small></div>
             </div>
             <aside class="rest-panel">
@@ -325,6 +339,7 @@
               <section class="rest-panel-view is-active" data-rest-panel="today">
                 <div class="rest-panel-title"><p class="eyebrow">НЕБОЛЬШИЕ ЦЕЛИ</p><h2>Сегодня вместе</h2><span id="restDailyProgress">0 / 3</span></div>
                 <div class="rest-dailies" id="restDailies"></div>
+                <div class="rest-bond"><div class="rest-bond-medal"><span>✦</span><b id="restLevel">1</b></div><div><small>УРОВЕНЬ ДРУЖБЫ</small><strong id="restBondTitle">Новое знакомство</strong><i><em id="restXpBar"></em></i><p><span id="restXpValue">0</span> / <span id="restXpNext">60</span> XP</p></div><button type="button" data-rest-start-game>Тренировка ↗</button></div>
                 <div class="rest-needs"><div><span>Настроение</span><b id="restMoodValue">82%</b><i><em id="restMoodBar"></em></i></div><div><span>Энергия</span><b id="restEnergyValue">76%</b><i><em id="restEnergyBar"></em></i></div><div><span>Сытость</span><b id="restHungerValue">72%</b><i><em id="restHungerBar"></em></i></div></div>
                 <div class="rest-journal"><span>ДНЕВНИК</span><p id="restJournal">Здесь появятся маленькие события вашего общего дня.</p></div>
               </section>

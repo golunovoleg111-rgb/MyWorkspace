@@ -68,6 +68,9 @@ class LivingScene {
     this.ballVelocity = null;
     this.hovered = null;
     this.theme = 'day';
+    this.game = null;
+    this.firefly = null;
+    this.sparkBursts = [];
     this.frame = this.frame.bind(this);
 
     this.scene = new THREE.Scene();
@@ -266,6 +269,8 @@ class LivingScene {
 
     this.particles = this.makeParticles();
     this.scene.add(this.particles);
+    this.effects = new THREE.Group();
+    this.scene.add(this.effects);
     this.applyInventory([]);
   }
 
@@ -296,7 +301,8 @@ class LivingScene {
       this.hovered = hit;
       this.renderer.domElement.style.cursor = hit ? 'pointer' : 'grab';
     }
-    if (activate && hit?.userData.restAction) this.action(hit.userData.restAction);
+    if (activate && hit?.userData.restAction === 'firefly') this.catchFirefly();
+    else if (activate && hit?.userData.restAction) this.action(hit.userData.restAction);
   }
 
   setActive(active) {
@@ -339,6 +345,7 @@ class LivingScene {
   }
 
   action(type) {
+    if (type === 'game') return this.startGame();
     if (type === 'ball') return this.throwBall();
     if (type === 'feed') return this.moveTo(new THREE.Vector3(3.55, 0, 2.35), 'К миске', () => this.perform('eat', 3.3, 'feed'));
     if (type === 'sleep') return this.moveTo(new THREE.Vector3(3.95, 0, -3.1), 'Идёт к лежанке', () => this.perform('sleep', 5, 'sleep'));
@@ -349,6 +356,124 @@ class LivingScene {
       this.lampLight.intensity = this.lampLight.intensity > 1 ? 0 : 14;
       this.onEvent('lamp', 'Свет в комнате изменился');
     }
+  }
+
+  startGame() {
+    if (this.game) return;
+    this.game = { score: 0, combo: 0, remaining: 30, lastTime: performance.now() / 1000, locked: false };
+    this.onEvent('game-start', { score: 0, combo: 1, remaining: 30 });
+    this.spawnFirefly();
+  }
+
+  stopGame(completed = false) {
+    if (!this.game) return;
+    const result = { score: this.game.score, combo: Math.max(1, this.game.combo), completed };
+    this.removeFirefly();
+    this.game = null;
+    this.state = 'happy';
+    this.stateUntil = performance.now() / 1000 + 1.8;
+    this.onEvent('game-end', result);
+  }
+
+  spawnFirefly() {
+    this.removeFirefly();
+    if (!this.game) return;
+    const points = [[-4.7, 1.35, 2.6], [-2.3, 2.15, -.65], [.6, 1.5, -2.6], [3.1, 2.25, -.8], [5.15, 1.45, 2.25], [1.8, 2.7, 1.75]];
+    const point = points[Math.floor(Math.random() * points.length)];
+    const uniforms = { uTime: { value: 0 }, uColor: { value: new THREE.Color(this.theme === 'night' ? '#72d8ff' : '#ffe27a') } };
+    const coreMaterial = new THREE.ShaderMaterial({
+      uniforms, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+      vertexShader: 'varying vec3 vNormal;varying vec3 vView;void main(){vNormal=normalize(normalMatrix*normal);vec4 mv=modelViewMatrix*vec4(position,1.0);vView=normalize(-mv.xyz);gl_Position=projectionMatrix*mv;}',
+      fragmentShader: 'uniform float uTime;uniform vec3 uColor;varying vec3 vNormal;varying vec3 vView;void main(){float rim=pow(1.0-max(0.0,dot(vNormal,vView)),2.2);float pulse=.72+.28*sin(uTime*5.0);gl_FragColor=vec4(uColor*(1.15+rim*1.8),(.72+rim*.28)*pulse);}'
+    });
+    const group = new THREE.Group();
+    const core = new THREE.Mesh(new THREE.IcosahedronGeometry(.24, 3), coreMaterial);
+    const halo = new THREE.Mesh(new THREE.TorusGeometry(.48, .025, 12, 64), new THREE.MeshBasicMaterial({ color: '#b9ebff', transparent: true, opacity: .75, blending: THREE.AdditiveBlending }));
+    const haloTwo = halo.clone();
+    halo.rotation.x = Math.PI / 2;
+    haloTwo.rotation.y = Math.PI / 2;
+    group.add(core, halo, haloTwo);
+    group.position.set(...point);
+    group.userData.baseY = point[1];
+    group.userData.uniforms = uniforms;
+    markInteractive(group, 'firefly', 'Поймать свет');
+    this.scene.add(group);
+    this.interactables.push(core, halo, haloTwo);
+    this.firefly = group;
+  }
+
+  removeFirefly() {
+    if (!this.firefly) return;
+    this.firefly.traverse((child) => {
+      const index = this.interactables.indexOf(child);
+      if (index >= 0) this.interactables.splice(index, 1);
+      child.geometry?.dispose?.();
+      child.material?.dispose?.();
+    });
+    this.scene.remove(this.firefly);
+    this.firefly = null;
+  }
+
+  catchFirefly() {
+    if (!this.game || !this.firefly || this.game.locked) return;
+    this.game.locked = true;
+    this.game.combo += 1;
+    const bonus = Math.min(5, this.game.combo);
+    this.game.score += 10 * bonus;
+    const target = this.firefly.position.clone();
+    target.y = 0;
+    this.makeSparkBurst(this.firefly.position);
+    this.removeFirefly();
+    this.onEvent('game-score', { score: this.game.score, combo: bonus, remaining: this.game.remaining });
+    this.moveTo(target, 'Ловит световой след', () => {
+      if (!this.game) return;
+      this.perform('play', .75, 'game-catch');
+      window.setTimeout(() => {
+        if (!this.game) return;
+        this.game.locked = false;
+        this.spawnFirefly();
+      }, 500);
+    });
+  }
+
+  makeSparkBurst(position) {
+    const count = 32;
+    const positions = new Float32Array(count * 3);
+    const velocities = [];
+    for (let i = 0; i < count; i += 1) velocities.push(new THREE.Vector3((Math.random() - .5) * 2.7, (Math.random() - .2) * 2.3, (Math.random() - .5) * 2.7));
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    const points = new THREE.Points(geometry, new THREE.PointsMaterial({ color: '#b8efff', size: .075, transparent: true, opacity: 1, blending: THREE.AdditiveBlending, depthWrite: false }));
+    points.position.copy(position);
+    this.effects.add(points);
+    this.sparkBursts.push({ points, velocities, age: 0 });
+  }
+
+  updateGame(delta, time) {
+    if (this.firefly) {
+      this.firefly.userData.uniforms.uTime.value = time;
+      this.firefly.position.y = this.firefly.userData.baseY + Math.sin(time * 2.8) * .16;
+      this.firefly.rotation.y += delta * 1.8;
+      this.firefly.children[1].rotation.z += delta * 1.4;
+      this.firefly.children[2].rotation.x -= delta * 1.1;
+    }
+    this.sparkBursts = this.sparkBursts.filter((burst) => {
+      burst.age += delta;
+      const positions = burst.points.geometry.attributes.position;
+      for (let i = 0; i < burst.velocities.length; i += 1) {
+        burst.velocities[i].y -= delta * 1.4;
+        positions.setXYZ(i, positions.getX(i) + burst.velocities[i].x * delta, positions.getY(i) + burst.velocities[i].y * delta, positions.getZ(i) + burst.velocities[i].z * delta);
+      }
+      positions.needsUpdate = true;
+      burst.points.material.opacity = Math.max(0, 1 - burst.age / 1.1);
+      if (burst.age < 1.1) return true;
+      this.effects.remove(burst.points); burst.points.geometry.dispose(); burst.points.material.dispose();
+      return false;
+    });
+    if (!this.game) return;
+    this.game.remaining = Math.max(0, 30 - (time - this.game.lastTime));
+    this.onEvent('game-tick', { score: this.game.score, combo: Math.max(1, this.game.combo), remaining: this.game.remaining });
+    if (this.game.remaining <= 0) this.stopGame(true);
   }
 
   moveTo(target, label, onArrive) {
@@ -453,6 +578,7 @@ class LivingScene {
     this.particles.rotation.y += delta * .018;
     this.updateBall(delta);
     this.updateMovement(delta);
+    this.updateGame(delta, time);
     if (this.stateUntil && time > this.stateUntil) {
       this.stateUntil = 0;
       this.state = 'idle';
@@ -480,9 +606,11 @@ export function initRestZone({ toast }) {
   if (!root || !container) return;
   const pet = read(PET_KEY, DEFAULT_PET);
   const life = read(LIFE_KEY, { mood: 82, energy: 76, hunger: 72 });
-  const saved = read(HOME_KEY, { coins: 48, inventory: [], theme: 'day', completed: {}, day: todayKey(), journal: 'Первый день в новом доме.' });
+  const saved = read(HOME_KEY, { coins: 48, inventory: [], theme: 'day', completed: {}, day: todayKey(), journal: 'Первый день в новом доме.', xp: 0, level: 1, bestScore: 0, conversations: 0 });
   if (saved.day !== todayKey()) { saved.day = todayKey(); saved.completed = {}; }
   saved.inventory = Array.isArray(saved.inventory) ? saved.inventory : [];
+  saved.xp = Math.max(0, Number(saved.xp) || 0);
+  saved.level = Math.max(1, Number(saved.level) || 1);
   let scene;
 
   const save = () => {
@@ -499,12 +627,33 @@ export function initRestZone({ toast }) {
       document.querySelector(`#rest${name}Bar`).style.width = `${value}%`;
     });
     document.querySelector('#restCoins').textContent = saved.coins;
+    const next = saved.level * 60;
+    const titles = ['Новое знакомство', 'Верный товарищ', 'Настоящая команда', 'Неразлучные друзья', 'Легендарная дружба'];
+    document.querySelector('#restLevel').textContent = saved.level;
+    document.querySelector('#restBondTitle').textContent = titles[Math.min(titles.length - 1, saved.level - 1)];
+    document.querySelector('#restXpValue').textContent = saved.xp;
+    document.querySelector('#restXpNext').textContent = next;
+    document.querySelector('#restXpBar').style.width = `${Math.min(100, saved.xp / next * 100)}%`;
+  }
+
+  function addXp(amount) {
+    saved.xp += amount;
+    let next = saved.level * 60;
+    while (saved.xp >= next) {
+      saved.xp -= next;
+      saved.level += 1;
+      saved.coins += 15;
+      toast(`Новый уровень дружбы · ${saved.level}`);
+      next = saved.level * 60;
+    }
+    updateNeeds();
   }
 
   const dailies = [
     { id: 'play', icon: '●', title: 'Поиграть вместе', copy: 'Бросьте питомцу мяч', reward: 8 },
     { id: 'feed', icon: '◒', title: 'Время угощения', copy: 'Подойдите к миске', reward: 6 },
-    { id: 'explore', icon: '↗', title: 'Посмотреть вокруг', copy: 'Исследуйте окно или интерьер', reward: 7 }
+    { id: 'explore', icon: '↗', title: 'Посмотреть вокруг', copy: 'Исследуйте окно или интерьер', reward: 7 },
+    { id: 'train', icon: '✦', title: 'Световой след', copy: 'Пройдите одну тренировку', reward: 10 }
   ];
 
   function renderDailies() {
@@ -519,6 +668,7 @@ export function initRestZone({ toast }) {
     if (item && !saved.completed[id]) {
       saved.completed[id] = true;
       saved.coins += item.reward;
+      addXp(8);
       toast(`Задание выполнено · +${item.reward} наград`);
     }
     if (message) {
@@ -529,12 +679,40 @@ export function initRestZone({ toast }) {
   }
 
   function handleSceneEvent(type, message) {
-    document.querySelector('#restPetState').textContent = message || 'Исследует комнату';
+    if (typeof message === 'string') document.querySelector('#restPetState').textContent = message || 'Исследует комнату';
     if (type === 'feed') { life.hunger = clamp(life.hunger + 22); life.mood = clamp(life.mood + 4); complete('feed', `${pet.name || 'Питомец'} с удовольствием поел и вернулся исследовать дом.`); }
     if (type === 'play') { life.mood = clamp(life.mood + 15); life.energy = clamp(life.energy - 5); complete('play', `Мяч пойман. Кажется, ${pet.name || 'питомец'} готов повторить это ещё раз.`); }
     if (type === 'explore') complete('explore', 'Вы вместе остановились у окна и немного посмотрели на город.');
     if (type === 'paw') { life.mood = clamp(life.mood + 7); saved.coins += 2; saved.journal = `${pet.name || 'Питомец'} дал лапу. Маленькая победа дня.`; updateNeeds(); save(); }
     if (type === 'sleep') { life.energy = clamp(life.energy + 18); updateNeeds(); save(); }
+    if (type === 'game-start') {
+      document.querySelector('#restGameHud').classList.add('is-active');
+      document.querySelector('#restStage').classList.add('is-playing');
+      document.querySelector('#restPetState').textContent = 'Готов к тренировке';
+    }
+    if (type === 'game-start' || type === 'game-score' || type === 'game-tick') {
+      document.querySelector('#restGameScore').textContent = String(message.score).padStart(3, '0');
+      document.querySelector('#restGameCombo').textContent = `×${message.combo}`;
+      document.querySelector('#restGameTimer').textContent = Math.ceil(message.remaining);
+      document.querySelector('#restGameTimerRing').style.setProperty('--progress', `${message.remaining / 30 * 360}deg`);
+    }
+    if (type === 'game-catch') life.mood = clamp(life.mood + 1);
+    if (type === 'game-end') {
+      document.querySelector('#restGameHud').classList.remove('is-active');
+      document.querySelector('#restStage').classList.remove('is-playing');
+      if (!message.completed) {
+        document.querySelector('#restPetState').textContent = 'Тренировка остановлена';
+        toast('Тренировка завершена без награды');
+        return;
+      }
+      const reward = Math.min(24, 4 + Math.floor(message.score / 25));
+      saved.bestScore = Math.max(saved.bestScore || 0, message.score);
+      saved.coins += reward;
+      addXp(Math.max(5, Math.floor(message.score / 10)));
+      complete('train', `Тренировка завершена: ${message.score} очков. Лучший результат — ${saved.bestScore}.`);
+      toast(`Световой след · ${message.score} очков · +${reward} ✦`);
+      document.querySelector('#restPetState').textContent = 'Доволен тренировкой';
+    }
   }
 
   function renderShop() {
@@ -555,6 +733,63 @@ export function initRestZone({ toast }) {
     }));
   }
 
+  const dialog = document.querySelector('#restDialog');
+  const dialogMessages = document.querySelector('#restDialogMessages');
+  const dialogInput = document.querySelector('#restDialogInput');
+
+  function addDialogMessage(role, copy) {
+    const bubble = document.createElement('p');
+    bubble.className = `rest-dialog-message is-${role}`;
+    bubble.textContent = copy;
+    dialogMessages.append(bubble);
+    dialogMessages.scrollTop = dialogMessages.scrollHeight;
+  }
+
+  function petReply(input, topic = '') {
+    const lower = String(input).toLowerCase();
+    const name = pet.name || (pet.species === 'cat' ? 'Котик' : 'Собачка');
+    if (topic === 'story' || /истори|сказк/.test(lower)) return `Сегодня я нашёл в комнате маленький луч света. Погнался за ним, а он оказался солнечным зайчиком. Я его почти поймал — но решил оставить на завтра. Хорошая история должна иметь продолжение.`;
+    if (topic === 'break' || /устал|отдох|перерыв/.test(lower)) return `Давай сделаем короткую паузу: расправь плечи, посмотри вдаль и три раза спокойно вдохни. А потом брось мне мяч — я возьму активную часть отдыха на себя.`;
+    if (topic === 'support' || /совет|сложно|не получ|груст|пережив/.test(lower)) return `Не пытайся победить весь день одним рывком. Выбери одну маленькую задачу, которую можно закончить за двадцать минут. Я побуду рядом, а после отметим победу.`;
+    if (/привет|как ты/.test(lower)) return `Я отлично. Дом становится уютнее, дружба крепче, а лучший результат в тренировке — ${saved.bestScore || 0}. Рад, что ты заглянул.`;
+    if (/любишь|нравится/.test(lower)) return `Мне нравятся спокойные минуты рядом, игры со световым следом и момент, когда в комнате включается вечерний свет. А ещё — когда меня называют по имени. Я ${name}.`;
+    if (/работ|аналит|отчет|отчёт/.test(lower)) return `Я заметил: самые ясные отчёты получаются, когда сначала формулируешь один главный вывод, а уже потом подкрепляешь его цифрами. Начни с вопроса: «Что должен понять читатель?»`;
+    const replies = [
+      `Я внимательно слушаю. Иногда проговорить мысль вслух — уже половина решения.`,
+      `Звучит важно. Хочешь, немного посидим рядом, а потом разложим всё на один следующий шаг?`,
+      `Я запомню этот момент в нашей маленькой истории. И да — ты справляешься лучше, чем тебе кажется.`
+    ];
+    return replies[(saved.conversations || 0) % replies.length];
+  }
+
+  function openDialog() {
+    dialog.classList.add('is-open');
+    dialog.setAttribute('aria-hidden', 'false');
+    if (!dialogMessages.childElementCount) addDialogMessage('pet', `Я здесь. Расскажешь, как проходит день? Можно попросить совет, историю или просто поговорить.`);
+    window.setTimeout(() => dialogInput.focus(), 220);
+    scene?.action('call');
+  }
+
+  function closeDialog() {
+    dialog.classList.remove('is-open');
+    dialog.setAttribute('aria-hidden', 'true');
+  }
+
+  function sendDialog(copy, topic = '') {
+    const value = String(copy || '').trim();
+    if (!value && !topic) return;
+    addDialogMessage('user', value || ({ support: 'Мне нужен совет', story: 'Расскажи историю', break: 'Давай немного отдохнём' }[topic]));
+    dialog.classList.add('is-thinking');
+    window.setTimeout(() => {
+      dialog.classList.remove('is-thinking');
+      addDialogMessage('pet', petReply(value, topic));
+      saved.conversations = (saved.conversations || 0) + 1;
+      life.mood = clamp(life.mood + 2);
+      addXp(2);
+      save();
+    }, 420);
+  }
+
   function activate() {
     if (!scene) {
       scene = new LivingScene(container, pet, handleSceneEvent);
@@ -566,6 +801,7 @@ export function initRestZone({ toast }) {
   }
 
   document.querySelector('#restPetName').textContent = pet.name || (pet.species === 'cat' ? 'Котик' : 'Собачка');
+  document.querySelector('#restDialogName').textContent = pet.name || (pet.species === 'cat' ? 'Котик' : 'Собачка');
   document.querySelector('#restPetMood').textContent = life.mood > 82 ? 'В ОТЛИЧНОМ НАСТРОЕНИИ' : 'РАД ВАС ВИДЕТЬ';
   document.querySelector('#restJournal').textContent = saved.journal;
   updateNeeds(); renderDailies(); renderShop();
@@ -574,9 +810,20 @@ export function initRestZone({ toast }) {
     document.querySelectorAll('[data-rest-action]').forEach((item) => item.classList.remove('is-active'));
     button.classList.add('is-active');
     window.setTimeout(() => button.classList.remove('is-active'), 650);
-    scene?.action(button.dataset.restAction);
+    if (button.dataset.restAction === 'talk') openDialog();
+    else scene?.action(button.dataset.restAction);
     document.querySelector('#restSceneHint').classList.add('is-hidden');
   }));
+  document.querySelectorAll('[data-rest-start-game]').forEach((button) => button.addEventListener('click', () => scene?.startGame()));
+  document.querySelector('#restGameExit').addEventListener('click', () => scene?.stopGame(false));
+  document.querySelector('#restDialogClose').addEventListener('click', closeDialog);
+  document.querySelector('#restDialogForm').addEventListener('submit', (event) => {
+    event.preventDefault();
+    const value = dialogInput.value;
+    dialogInput.value = '';
+    sendDialog(value);
+  });
+  document.querySelectorAll('[data-rest-topic]').forEach((button) => button.addEventListener('click', () => sendDialog('', button.dataset.restTopic)));
   document.querySelectorAll('[data-rest-tab]').forEach((button) => button.addEventListener('click', () => {
     document.querySelectorAll('[data-rest-tab]').forEach((item) => item.classList.toggle('is-active', item === button));
     document.querySelectorAll('[data-rest-panel]').forEach((panel) => panel.classList.toggle('is-active', panel.dataset.restPanel === button.dataset.restTab));
@@ -588,6 +835,7 @@ export function initRestZone({ toast }) {
     scene?.applyInventory(saved.inventory);
     save();
   }));
+  document.querySelectorAll('[data-rest-theme]').forEach((button) => button.classList.toggle('is-active', button.dataset.restTheme === saved.theme));
   document.addEventListener('myworkspace:view-change', (event) => {
     if (event.detail.name === 'rest') activate();
     else scene?.setActive(false);

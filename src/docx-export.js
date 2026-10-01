@@ -13,6 +13,24 @@ const borders = {
 
 const cleanLines = (value = '') => value.split('\n').map((line) => line.trim()).filter(Boolean);
 const meaningfulRows = (table) => (table?.rows || []).filter((row) => row.some((cell) => cell && cell !== '—'));
+const readableDate = (value = '') => /^\d{4}-\d{2}-\d{2}$/.test(value) ? new Intl.DateTimeFormat('ru-RU').format(new Date(`${value}T12:00:00`)) : value;
+const revenueNumber = (value = '') => {
+  const amount = Number.parseFloat(String(value).replace(/[^\d,.-]/g, '').replace(',', '.'));
+  return Number.isFinite(amount) ? amount : 0;
+};
+const money = (value) => `${new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 }).format(value || 0)} ₽`;
+
+function revenueSummary(table) {
+  const totals = { 2025: 0, 2026: 0 };
+  const counts = { 2025: 0, 2026: 0 };
+  (table?.rows || []).forEach((row) => {
+    const year = String(row[0] || '').trim();
+    const amount = revenueNumber(row[2]);
+    if (year in totals && amount > 0) { totals[year] += amount; counts[year] += 1; }
+  });
+  const growth = totals[2025] > 0 && counts[2025] === counts[2026] && counts[2025] > 0 ? ((totals[2026] - totals[2025]) / totals[2025]) * 100 : null;
+  return { ...totals, counts, growth };
+}
 
 function heading(text, level = 1) {
   return new Paragraph({ style: level === 1 ? 'SectionHeading' : 'Subheading', keepNext: true, children: [new TextRun(text)] });
@@ -41,8 +59,8 @@ function fitImage(width, height) {
   return { width: Math.max(1, Math.round(width * scale)), height: Math.max(1, Math.round(height * scale)) };
 }
 
-function fixedTable(table, widths) {
-  const rows = meaningfulRows(table);
+function fixedTable(table, widths, requiredColumn = null) {
+  const rows = meaningfulRows(table).filter((row) => requiredColumn === null || (row[requiredColumn] && row[requiredColumn] !== '—'));
   if (!rows.length) return null;
   const cell = (text, width, header = false, shade = false) => new TableCell({
     width: { size: width, type: WidthType.DXA }, verticalAlign: VerticalAlign.CENTER,
@@ -64,8 +82,8 @@ function keyValueTable(items) {
   return new Table({ width: { size: CONTENT_WIDTH, type: WidthType.DXA }, layout: TableLayoutType.FIXED, columnWidths: [3100, 6980], borders, rows });
 }
 
-function addTableSection(children, title, table, widths = [3300, 3300, 3480]) {
-  const built = fixedTable(table, widths);
+function addTableSection(children, title, table, widths = [3300, 3300, 3480], requiredColumn = null) {
+  const built = fixedTable(table, widths, requiredColumn);
   if (!built) return;
   children.push(heading(title), built, new Paragraph({ spacing: { after: 100 }, children: [] }));
 }
@@ -92,21 +110,39 @@ export async function buildAnalyticsDocxBlob(data) {
 
   const passport = keyValueTable([['Категория', data.productCategory], ['Этап', data.projectStage], ['Ответственный', data.projectOwner], ['Задача проекта', data.projectGoal]]);
   if (passport) children.push(heading('Паспорт проекта'), passport);
-  const market = keyValueTable([['Товаров в категории', data.marketVolume], ['Средняя цена', data.averagePrice], ['Сезонность', data.seasonality], ['Главный конкурент', data.competitorName], ['Цена конкурента', data.competitorPrice], ['Что ценят покупатели', data.marketStrengths], ['Риски и жалобы', data.marketRisks], ['Вывод по рынку', data.observation]]);
-  if (market) children.push(heading('Рынок и конкуренты'), market);
+  const market = keyValueTable([['Товаров в категории', data.marketVolume], ['Средняя цена', data.averagePrice], ['Сезонность', data.seasonality]]);
+  if (market) children.push(heading('Картина рынка'), market);
+  const competitor = keyValueTable([
+    ['Бренд / конкурент', data.competitorName], ['ИП / юридическое лицо', data.competitorLegalName],
+    ['Дата запуска товара', readableDate(data.competitorLaunchDate)], ['Схема работы', data.competitorFulfillment],
+    ['Цена конкурента', data.competitorPrice], ['Размерный ряд', data.competitorSizeRange],
+    ['Самые востребованные размеры', data.competitorTopSizes]
+  ]);
+  if (competitor) children.push(heading('Профиль конкурента'), competitor);
+  addTableSection(children, 'Спрос по размерам конкурента', data.competitorSizes, [2100, 2800, 5180]);
+  const revenue = revenueSummary(data.competitorRevenue);
+  const hasRevenue = (data.competitorRevenue?.rows || []).some((row) => revenueNumber(row[2]) > 0);
+  if (hasRevenue) {
+    const growth = revenue.growth === null ? '—' : `${revenue.growth >= 0 ? '+' : ''}${revenue.growth.toFixed(1).replace('.', ',')}%`;
+    const revenueTotals = keyValueTable([['Выручка за 2025 год', money(revenue[2025])], ['Выручка за 2026 год', money(revenue[2026])], ['Динамика', growth]]);
+    children.push(heading('Выручка конкурента · 2025–2026'), revenueTotals);
+    addTableSection(children, 'Детализация выручки', data.competitorRevenue, [1400, 2200, 2200, 4280], 2);
+  }
+  const marketInsights = keyValueTable([['Что ценят покупатели', data.marketStrengths], ['Риски и жалобы', data.marketRisks], ['Аналитический вывод', data.observation]]);
+  if (marketInsights) children.push(heading('Вывод по рынку'), marketInsights);
 
   await addImages(children, data.images || []);
   addTextSection(children, 'Примерка и образцы', data.fittingNotes);
   addTextSection(children, 'Дефекты и доработки', data.productDefects);
-  addTableSection(children, 'Замеры', data.measurements, [2700, 4580, 2800]);
+  addTableSection(children, 'Замеры', data.measurements, [2700, 4580, 2800], 2);
   addTableSection(children, 'Хронология разработки', data.timeline, [2100, 5480, 2500]);
-  addTableSection(children, 'Экономика единицы', data.economics, [3500, 2400, 4180]);
+  addTableSection(children, 'Экономика единицы', data.economics, [3500, 2400, 4180], 1);
 
   const fabric = keyValueTable([['Расход ткани', data.fabricConsumption], ['Стоимость ткани', data.fabricPrice], ['Стоимость пошива', data.sewingCost], ['Источник ткани', data.fabricSource], ['Минимальный заказ', data.fabricMoq], ['Комментарий', data.fabricNotes]]);
   if (fabric) children.push(heading('Ткань и производство'), fabric);
   const launch = keyValueTable([['Цвета запуска', data.launchColors], ['Лучший месяц запуска', data.launchMonth], ['Посылки и логистика', data.parcelNotes]]);
   if (launch) children.push(heading('План запуска'), launch);
-  addTableSection(children, 'Первый заказ', data.sizes, [2500, 3000, 4580]);
+  addTableSection(children, 'Первый заказ', data.sizes, [2500, 3000, 4580], 1);
   addTextSection(children, 'Итоговое решение', data.conclusion);
 
   const actions = cleanLines(data.actions);

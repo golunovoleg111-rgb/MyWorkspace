@@ -275,28 +275,70 @@ function tableData(selector) {
 
 const dossierIds = [
   'reportTitle', 'reportPeriod', 'productCategory', 'projectStage', 'projectOwner', 'projectGoal',
-  'marketVolume', 'averagePrice', 'seasonality', 'competitorName', 'competitorPrice', 'marketStrengths',
+  'marketVolume', 'averagePrice', 'seasonality', 'competitorName', 'competitorLegalName',
+  'competitorLaunchDate', 'competitorFulfillment', 'competitorPrice', 'competitorSizeRange',
+  'competitorTopSizes', 'marketStrengths',
   'marketRisks', 'reportObservation', 'fittingNotes', 'productDefects', 'fabricConsumption', 'fabricPrice',
   'sewingCost', 'fabricSource', 'fabricMoq', 'fabricNotes', 'launchColors', 'launchMonth', 'parcelNotes',
   'reportConclusion', 'reportActions', 'productDescription'
 ];
+
+const dossierTables = ['#measurementsTable', '#timelineTable', '#economicsTable', '#sizesTable', '#competitorSizesTable', '#competitorRevenueTable'];
+const defaultDossierRows = Object.fromEntries(dossierTables.map((selector) => [selector, $(`${selector} tbody`).innerHTML]));
 
 function reportData() {
   const values = Object.fromEntries(dossierIds.map((id) => [id, $(`#${id}`).value.trim()]));
   return { ...values, title: values.reportTitle, period: values.reportPeriod, observation: values.reportObservation,
     conclusion: values.reportConclusion, actions: values.reportActions, images: reportImages,
     measurements: tableData('#measurementsTable'), timeline: tableData('#timelineTable'),
-    economics: tableData('#economicsTable'), sizes: tableData('#sizesTable') };
+    economics: tableData('#economicsTable'), sizes: tableData('#sizesTable'),
+    competitorSizes: tableData('#competitorSizesTable'), competitorRevenue: tableData('#competitorRevenueTable') };
 }
 
 function meaningfulRows(table) {
   return table.rows.filter((row) => row.some((cell) => cell && cell !== '—'));
 }
 
-function previewTable(title, table) {
-  const rows = meaningfulRows(table);
+function previewTable(title, table, requiredColumn = null) {
+  const rows = meaningfulRows(table).filter((row) => requiredColumn === null || (row[requiredColumn] && row[requiredColumn] !== '—'));
   if (!rows.length) return '';
   return `<section><h2>${title}</h2><table class="report-table"><thead><tr>${table.headers.map((cell) => `<th>${escapeHtml(cell)}</th>`).join('')}</tr></thead><tbody>${rows.slice(0, 6).map((row) => `<tr>${row.map((cell) => `<td>${escapeHtml(cell)}</td>`).join('')}</tr>`).join('')}</tbody></table></section>`;
+}
+
+function readableDate(value) {
+  if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return value || '';
+  return new Intl.DateTimeFormat('ru-RU').format(new Date(`${value}T12:00:00`));
+}
+
+function revenueNumber(value = '') {
+  const normalized = String(value).replace(/[^\d,.-]/g, '').replace(',', '.');
+  const amount = Number.parseFloat(normalized);
+  return Number.isFinite(amount) ? amount : 0;
+}
+
+function revenueMetrics(table) {
+  const totals = { 2025: 0, 2026: 0 };
+  const counts = { 2025: 0, 2026: 0 };
+  (table?.rows || []).forEach((row) => {
+    const year = String(row[0] || '').trim();
+    const amount = revenueNumber(row[2]);
+    if (year in totals && amount > 0) { totals[year] += amount; counts[year] += 1; }
+  });
+  const growth = totals[2025] > 0 && counts[2025] === counts[2026] && counts[2025] > 0 ? ((totals[2026] - totals[2025]) / totals[2025]) * 100 : null;
+  return { ...totals, counts, growth };
+}
+
+function money(value) {
+  return new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 }).format(value || 0) + ' ₽';
+}
+
+function updateRevenueSummary(table = tableData('#competitorRevenueTable')) {
+  const metrics = revenueMetrics(table);
+  $('#revenue2025Total').textContent = money(metrics[2025]);
+  $('#revenue2026Total').textContent = money(metrics[2026]);
+  $('#revenueGrowth').textContent = metrics.growth === null ? '—' : `${metrics.growth >= 0 ? '+' : ''}${metrics.growth.toFixed(1).replace('.', ',')}%`;
+  $('#revenueGrowth').classList.toggle('is-positive', metrics.growth > 0);
+  $('#revenueGrowth').classList.toggle('is-negative', metrics.growth < 0);
 }
 
 function reportMarkup(data, emptyAllowed = true) {
@@ -304,12 +346,20 @@ function reportMarkup(data, emptyAllowed = true) {
   if (!hasContent && emptyAllowed) return '<div class="report-empty"><span>✦</span><strong>Досье появится здесь</strong><p>Заполняйте разделы слева — документ будет собираться автоматически.</p></div>';
   const actions = data.actions.split('\n').map((line) => line.trim()).filter(Boolean);
   const meta = [data.productCategory, data.projectStage, data.projectOwner].filter(Boolean).map(escapeHtml).join(' · ');
+  const competitorProfile = [data.competitorName, data.competitorLegalName, data.competitorLaunchDate, data.competitorFulfillment, data.competitorPrice, data.competitorSizeRange, data.competitorTopSizes].some(Boolean);
+  const revenue = revenueMetrics(data.competitorRevenue);
+  const hasRevenue = (data.competitorRevenue?.rows || []).some((row) => revenueNumber(row[2]) > 0);
+  const hasCompetitorSizes = meaningfulRows(data.competitorSizes).length > 0;
   return `<article class="report-doc dossier-doc"><span class="report-mark">MYWORKSPACE · ДОСЬЕ ИЗДЕЛИЯ</span><h1>${escapeHtml(data.title || 'Разработка товара')}</h1><div class="report-period">${escapeHtml(data.period || formatDate(new Date()))}</div>${meta ? `<p class="report-meta">${meta}</p>` : ''}<div class="report-rule"></div>
   ${data.projectGoal ? `<section><h2>Задача проекта</h2><p>${escapeHtml(data.projectGoal).replace(/\n/g, '<br>')}</p></section>` : ''}
-  ${(data.marketVolume || data.averagePrice || data.seasonality || data.competitorName) ? `<section><h2>Рынок и конкурент</h2><div class="preview-facts">${data.marketVolume ? `<div><b>${escapeHtml(data.marketVolume)}</b><span>товаров в категории</span></div>` : ''}${data.averagePrice ? `<div><b>${escapeHtml(data.averagePrice)}</b><span>средняя цена</span></div>` : ''}${data.competitorName ? `<div><b>${escapeHtml(data.competitorName)}</b><span>главный конкурент</span></div>` : ''}</div>${data.observation ? `<p>${escapeHtml(data.observation).replace(/\n/g, '<br>')}</p>` : ''}</section>` : ''}
+  ${(data.marketVolume || data.averagePrice || data.seasonality) ? `<section><h2>Картина рынка</h2><div class="preview-facts">${data.marketVolume ? `<div><b>${escapeHtml(data.marketVolume)}</b><span>товаров в категории</span></div>` : ''}${data.averagePrice ? `<div><b>${escapeHtml(data.averagePrice)}</b><span>средняя цена</span></div>` : ''}${data.seasonality ? `<div><b>${escapeHtml(data.seasonality)}</b><span>сезонность</span></div>` : ''}</div></section>` : ''}
+  ${competitorProfile ? `<section class="preview-competitor"><h2>Профиль конкурента</h2><h3>${escapeHtml(data.competitorName || 'Конкурент')}</h3>${data.competitorLegalName ? `<p class="preview-legal">${escapeHtml(data.competitorLegalName)}</p>` : ''}<div class="preview-facts compact">${data.competitorLaunchDate ? `<div><b>${escapeHtml(readableDate(data.competitorLaunchDate))}</b><span>запуск товара</span></div>` : ''}${data.competitorFulfillment ? `<div><b>${escapeHtml(data.competitorFulfillment)}</b><span>схема работы</span></div>` : ''}${data.competitorPrice ? `<div><b>${escapeHtml(data.competitorPrice)}</b><span>цена</span></div>` : ''}${data.competitorSizeRange ? `<div><b>${escapeHtml(data.competitorSizeRange)}</b><span>размерный ряд</span></div>` : ''}${data.competitorTopSizes ? `<div><b>${escapeHtml(data.competitorTopSizes)}</b><span>лидеры спроса</span></div>` : ''}</div></section>` : ''}
+  ${hasCompetitorSizes ? previewTable('Спрос по размерам конкурента', data.competitorSizes) : ''}
+  ${hasRevenue ? `<section><h2>Выручка конкурента</h2><div class="preview-facts revenue"><div><b>${money(revenue[2025])}</b><span>2025 год</span></div><div><b>${money(revenue[2026])}</b><span>2026 год</span></div><div><b>${revenue.growth === null ? '—' : `${revenue.growth >= 0 ? '+' : ''}${revenue.growth.toFixed(1).replace('.', ',')}%`}</b><span>динамика</span></div></div>${previewTable('Детализация выручки', data.competitorRevenue, 2)}</section>` : ''}
+  ${(data.marketStrengths || data.marketRisks || data.observation) ? `<section><h2>Аналитический вывод</h2>${data.marketStrengths ? `<p><b>Сильные стороны:</b> ${escapeHtml(data.marketStrengths).replace(/\n/g, '<br>')}</p>` : ''}${data.marketRisks ? `<p><b>Риски:</b> ${escapeHtml(data.marketRisks).replace(/\n/g, '<br>')}</p>` : ''}${data.observation ? `<p>${escapeHtml(data.observation).replace(/\n/g, '<br>')}</p>` : ''}</section>` : ''}
   ${data.images.length ? `<section><h2>Материалы</h2><div class="report-images">${data.images.slice(0, 4).map((image) => `<div class="report-image"><img src="${image.src}" alt="" /><small><b>${escapeHtml(image.category || 'Материал')}</b> · ${escapeHtml(image.caption)}</small></div>`).join('')}</div></section>` : ''}
   ${data.fittingNotes ? `<section><h2>Примерка и образцы</h2><p>${escapeHtml(data.fittingNotes).replace(/\n/g, '<br>')}</p></section>` : ''}
-  ${previewTable('Замеры', data.measurements)}${previewTable('Экономика', data.economics)}${previewTable('Первый заказ', data.sizes)}
+  ${previewTable('Замеры', data.measurements, 2)}${previewTable('Экономика', data.economics, 1)}${previewTable('Первый заказ', data.sizes, 1)}
   ${data.conclusion ? `<section><h2>Итоговое решение</h2><p>${escapeHtml(data.conclusion).replace(/\n/g, '<br>')}</p></section>` : ''}${actions.length ? `<section><h2>Следующие действия</h2><ul>${actions.map((action) => `<li>${escapeHtml(action.replace(/^[•\-–\d.)\s]+/, ''))}</li>`).join('')}</ul></section>` : ''}</article>`;
 }
 
@@ -335,17 +385,20 @@ function loadDraft() {
   if (!data.reportTitle && data.title) data.reportTitle = data.title;
   if (!data.reportPeriod && data.period) data.reportPeriod = data.period;
   dossierIds.forEach((id) => { if (data[id] !== undefined) $(`#${id}`).value = data[id]; });
-  [['#measurementsTable', data.measurements], ['#timelineTable', data.timeline], ['#economicsTable', data.economics], ['#sizesTable', data.sizes]].forEach(([selector, table]) => {
+  [['#measurementsTable', data.measurements], ['#timelineTable', data.timeline], ['#economicsTable', data.economics], ['#sizesTable', data.sizes], ['#competitorSizesTable', data.competitorSizes], ['#competitorRevenueTable', data.competitorRevenue]].forEach(([selector, table]) => {
     if (!table?.rows?.length) return;
     $(`${selector} tbody`).innerHTML = table.rows.map((row) => `<tr>${row.map((cell) => `<td contenteditable="true">${escapeHtml(cell)}</td>`).join('')}</tr>`).join('');
   });
   buildReport(false);
+  updateRevenueSummary();
   updateProgress();
 }
 
 function resetReport() {
   dossierIds.forEach((id) => { $(`#${id}`).value = ''; });
+  dossierTables.forEach((selector) => { $(`${selector} tbody`).innerHTML = defaultDossierRows[selector]; });
   reportImages = []; renderImages(); localStorage.removeItem(keys.draft); buildReport(false); updateProgress(); toast('Форма очищена');
+  updateRevenueSummary();
 }
 
 async function exportWord() {
@@ -370,13 +423,21 @@ function safeName(name) { return name.replace(/[\\/:*?"<>|]/g, '').trim().slice(
 function addTableRow(tableSelector, cells) {
   const row = document.createElement('tr');
   row.innerHTML = cells.map((cell) => `<td contenteditable="true">${cell}</td>`).join('');
-  $(`${tableSelector} tbody`).append(row); buildReport(false);
+  $(`${tableSelector} tbody`).append(row); buildReport(false); scheduleDraftSave();
+}
+
+let draftSaveTimer;
+function scheduleDraftSave() {
+  window.clearTimeout(draftSaveTimer);
+  draftSaveTimer = window.setTimeout(() => save(keys.draft, { ...reportData(), images: [] }), 450);
 }
 
 function updateProgress() {
   const fields = $$('[data-dossier-field]');
-  const completed = fields.filter((field) => field.value.trim()).length + (reportImages.length ? 1 : 0);
-  const percent = Math.round((completed / (fields.length + 1)) * 100);
+  const hasCompetitorSizeData = meaningfulRows(tableData('#competitorSizesTable')).length > 0;
+  const hasRevenueData = tableData('#competitorRevenueTable').rows.some((row) => revenueNumber(row[2]) > 0);
+  const completed = fields.filter((field) => field.value.trim()).length + (reportImages.length ? 1 : 0) + (hasCompetitorSizeData ? 1 : 0) + (hasRevenueData ? 1 : 0);
+  const percent = Math.round((completed / (fields.length + 3)) * 100);
   $('#dossierProgress').textContent = `${percent}%`;
 }
 
@@ -428,8 +489,10 @@ $('#addMeasurement').addEventListener('click', () => addTableRow('#measurementsT
 $('#addTimeline').addEventListener('click', () => addTableRow('#timelineTable', ['—', 'Новое событие', 'В работе']));
 $('#addEconomic').addEventListener('click', () => addTableRow('#economicsTable', ['Новый показатель', '—', '—']));
 $('#addSize').addEventListener('click', () => addTableRow('#sizesTable', ['—', '—', '—']));
-$$('[data-dossier-field]').forEach((field) => field.addEventListener('input', () => { buildReport(false); updateProgress(); }));
-$$('.input-table').forEach((table) => table.addEventListener('input', () => buildReport(false)));
+$('#addCompetitorSize').addEventListener('click', () => addTableRow('#competitorSizesTable', ['—', '—', '—']));
+$('#addCompetitorRevenue').addEventListener('click', () => addTableRow('#competitorRevenueTable', ['2026', 'Новый период', '—', '—']));
+$$('[data-dossier-field]').forEach((field) => field.addEventListener('input', () => { buildReport(false); updateProgress(); scheduleDraftSave(); }));
+$$('.input-table').forEach((table) => table.addEventListener('input', () => { buildReport(false); updateRevenueSummary(); updateProgress(); scheduleDraftSave(); }));
 $$('[data-jump]').forEach((button) => button.addEventListener('click', () => {
   const section = $(`#${button.dataset.jump}`); section.open = true; section.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }));
@@ -437,7 +500,7 @@ $('#buildReport').addEventListener('click', () => buildReport(true)); $('#saveDr
 $('#exportPdf').addEventListener('click', () => { buildReport(false); window.print(); }); $('#exportWord').addEventListener('click', exportWord);
 
 $('#today').textContent = new Intl.DateTimeFormat('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date());
-$('#reportPreview').innerHTML = reportMarkup(reportData());
+$('#reportPreview').innerHTML = reportMarkup(reportData()); updateRevenueSummary();
 updateFileCounts(); renderFiles(); loadDraft(); updateProgress(); updateProfileUi(); initStoreAnalysis(); initWorkspaceModules({ toast, switchView }); registerWebMcp();
 window.setTimeout(() => {
   $('#welcome')?.remove();

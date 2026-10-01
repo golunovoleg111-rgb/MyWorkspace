@@ -65,7 +65,7 @@
           <div><strong>Всё работает локально</strong><p>Данные остаются на этом устройстве</p></div>
         </div>
         <button class="tour-restart" id="restartTour"><span>?</span><div><strong>Обучение</strong><small>Повторить подсказки</small></div></button>
-        <div class="sidebar-footer">v1.2 · личное пространство</div>
+        <div class="sidebar-footer">v1.3 · аналитика 360°</div>
       </aside>
 
       <main class="workspace">
@@ -139,11 +139,11 @@
 
         <section class="view" id="view-analytics">
           <div class="page-heading compact-heading analytics-heading">
-            <div><p class="eyebrow">ДОСЬЕ ИЗДЕЛИЯ</p><h1>Разработка товара</h1><p>Весь путь изделия: рынок, образцы, примерки, экономика, запуск и итоговое описание.</p></div>
+            <div><p class="eyebrow">КОНСТРУКТОР АНАЛИТИКИ</p><h1>Досье товара 360°</h1><p>Соберите доказательную картину по рынку, конкуренту, образцам и запуску — в одном профессиональном отчёте.</p><div class="analytics-badges"><span>Автосохранение черновика</span><span>PDF + DOCX</span><span>Данные только в браузере</span></div></div>
             <div class="dossier-progress"><strong id="dossierProgress">0%</strong><span>заполнено</span></div>
           </div>
           <div class="dossier-nav" aria-label="Разделы досье">
-            <button data-jump="section-base">01 Паспорт</button><button data-jump="section-market">02 Рынок</button><button data-jump="section-media">03 Материалы</button><button data-jump="section-product">04 Изделие</button><button data-jump="section-launch">05 Запуск</button><button data-jump="section-final">06 Итог</button>
+            <button data-jump="section-base"><b>01</b><span>Паспорт</span></button><button data-jump="section-market"><b>02</b><span>Конкурент</span></button><button data-jump="section-media"><b>03</b><span>Материалы</span></button><button data-jump="section-product"><b>04</b><span>Изделие</span></button><button data-jump="section-launch"><b>05</b><span>Запуск</span></button><button data-jump="section-final"><b>06</b><span>Итог</span></button>
           </div>
           <div class="analytics-layout dossier-layout">
             <div class="composer">
@@ -156,18 +156,37 @@
                 </div>
               </details>
 
-              <details class="dossier-section" id="section-market" open>
-                <summary><span class="step-number">02</span><div><h2>Рынок и конкуренты</h2><p>Категория, спрос, цена и отзывы</p></div><b>⌄</b></summary>
+              <details class="dossier-section competitor-section" id="section-market" open>
+                <summary><span class="step-number">02</span><div><h2>Рынок и конкурент</h2><p>Юридические данные, запуск, логистика, размеры и выручка</p></div><b>⌄</b></summary>
                 <div class="dossier-body">
-                  <div class="form-grid three"><label><span>Товаров в категории</span><input id="marketVolume" data-dossier-field placeholder="46 169" /></label><label><span>Средняя цена</span><input id="averagePrice" data-dossier-field placeholder="7 500–8 800 ₽" /></label><label><span>Сезонность</span><input id="seasonality" data-dossier-field placeholder="Пик: февраль–март, сентябрь" /></label></div>
-                  <div class="form-grid two"><label><span>Главный конкурент</span><input id="competitorName" data-dossier-field placeholder="LOOK.IN" /></label><label><span>Цена конкурента</span><input id="competitorPrice" data-dossier-field placeholder="7 030 ₽ для клиента" /></label></div>
-                  <label><span>Что покупатели ценят</span><textarea id="marketStrengths" data-dossier-field rows="3" placeholder="Посадка, внешний вид, качество пошива..."></textarea></label>
-                  <label><span>Риски и жалобы</span><textarea id="marketRisks" data-dossier-field rows="3" placeholder="Фурнитура, ткань, длина, размерность..."></textarea></label>
-                  <label><span>Вывод по рынку</span><textarea id="reportObservation" data-dossier-field rows="4" placeholder="Почему изделие стоит или не стоит брать в разработку"></textarea></label>
+                  <div class="section-intro"><span>КОНКУРЕНТ 360°</span><div><h3>Соберите проверяемый профиль</h3><p>Сначала зафиксируйте, кто продаёт товар и как он работает. Затем внесите размерный спрос и финансовую динамику.</p></div></div>
+                  <div class="market-baseline">
+                    <div class="form-grid three"><label><span>Товаров в категории</span><input id="marketVolume" data-dossier-field placeholder="46 169" /></label><label><span>Средняя цена</span><input id="averagePrice" data-dossier-field placeholder="7 500–8 800 ₽" /></label><label><span>Сезонность</span><input id="seasonality" data-dossier-field placeholder="Пик: февраль–март, сентябрь" /></label></div>
+                  </div>
+                  <div class="competitor-card">
+                    <div class="competitor-card-head"><div><span class="eyebrow">КАРТОЧКА КОНКУРЕНТА</span><h3>Идентификация и модель продаж</h3></div><span class="verified-chip">Для точной аналитики</span></div>
+                    <div class="form-grid two"><label><span>Бренд / название конкурента</span><input id="competitorName" data-dossier-field placeholder="LOOK.IN" /></label><label><span>ИП / юридическое лицо</span><input id="competitorLegalName" data-dossier-field placeholder="ИП Иванов Иван Иванович" /></label></div>
+                    <div class="form-grid three"><label><span>Дата запуска товара</span><input id="competitorLaunchDate" type="date" data-dossier-field /></label><label><span>Схема работы</span><select id="competitorFulfillment" data-dossier-field><option value="">Выберите схему</option><option>FBO</option><option>FBS</option><option>FBO + FBS</option><option>Не определено</option></select></label><label><span>Цена конкурента</span><input id="competitorPrice" data-dossier-field placeholder="7 030 ₽ для клиента" /></label></div>
+                  </div>
+
+                  <div class="competitor-block">
+                    <div class="subsection-head"><div><span class="subsection-index">A</span><h3>Размерная матрица и спрос</h3><p>Полный ряд, ключевые размеры и фактическое наблюдение</p></div><button class="small-button" id="addCompetitorSize" type="button">＋ Размер</button></div>
+                    <div class="form-grid two"><label><span>Размерный ряд конкурента</span><input id="competitorSizeRange" data-dossier-field placeholder="40–54" /></label><label><span>Самые востребованные размеры</span><input id="competitorTopSizes" data-dossier-field placeholder="44, 46 и 48" /></label></div>
+                    <div class="table-scroll"><table class="input-table" id="competitorSizesTable"><thead><tr><th>Размер</th><th>Уровень спроса</th><th>Наблюдение</th></tr></thead><tbody><tr><td contenteditable="true">—</td><td contenteditable="true">—</td><td contenteditable="true">—</td></tr><tr><td contenteditable="true">—</td><td contenteditable="true">—</td><td contenteditable="true">—</td></tr><tr><td contenteditable="true">—</td><td contenteditable="true">—</td><td contenteditable="true">—</td></tr></tbody></table></div>
+                  </div>
+
+                  <div class="competitor-block revenue-block">
+                    <div class="subsection-head"><div><span class="subsection-index">B</span><h3>Выручка конкурента · 2025–2026</h3><p>Вносите сумму в рублях по кварталам или добавляйте собственные периоды</p></div><button class="small-button" id="addCompetitorRevenue" type="button">＋ Период</button></div>
+                    <div class="revenue-summary"><div><span>2025</span><strong id="revenue2025Total">0 ₽</strong></div><div><span>2026</span><strong id="revenue2026Total">0 ₽</strong></div><div><span>Динамика</span><strong id="revenueGrowth">—</strong></div></div>
+                    <div class="table-scroll"><table class="input-table revenue-table" id="competitorRevenueTable"><thead><tr><th>Год</th><th>Период</th><th>Выручка, ₽</th><th>Источник / комментарий</th></tr></thead><tbody><tr><td contenteditable="true">2025</td><td contenteditable="true">I квартал</td><td contenteditable="true">—</td><td contenteditable="true">—</td></tr><tr><td contenteditable="true">2025</td><td contenteditable="true">II квартал</td><td contenteditable="true">—</td><td contenteditable="true">—</td></tr><tr><td contenteditable="true">2025</td><td contenteditable="true">III квартал</td><td contenteditable="true">—</td><td contenteditable="true">—</td></tr><tr><td contenteditable="true">2025</td><td contenteditable="true">IV квартал</td><td contenteditable="true">—</td><td contenteditable="true">—</td></tr><tr><td contenteditable="true">2026</td><td contenteditable="true">I квартал</td><td contenteditable="true">—</td><td contenteditable="true">—</td></tr><tr><td contenteditable="true">2026</td><td contenteditable="true">II квартал</td><td contenteditable="true">—</td><td contenteditable="true">—</td></tr><tr><td contenteditable="true">2026</td><td contenteditable="true">III квартал</td><td contenteditable="true">—</td><td contenteditable="true">—</td></tr><tr><td contenteditable="true">2026</td><td contenteditable="true">IV квартал</td><td contenteditable="true">—</td><td contenteditable="true">—</td></tr></tbody></table></div>
+                  </div>
+
+                  <div class="insight-grid"><label><span>Что покупатели ценят</span><textarea id="marketStrengths" data-dossier-field rows="3" placeholder="Посадка, внешний вид, качество пошива..."></textarea></label><label><span>Риски и жалобы</span><textarea id="marketRisks" data-dossier-field rows="3" placeholder="Фурнитура, ткань, длина, размерность..."></textarea></label></div>
+                  <label class="final-insight"><span>Аналитический вывод по рынку</span><textarea id="reportObservation" data-dossier-field rows="4" placeholder="Почему изделие стоит или не стоит брать в разработку, на какие размеры и модель поставки ориентироваться"></textarea></label>
                 </div>
               </details>
 
-              <details class="dossier-section" id="section-media" open>
+              <details class="dossier-section" id="section-media">
                 <summary><span class="step-number">03</span><div><h2>Фото и материалы</h2><p>Конкуренты, примерки, дефекты, ткань и посылки</p></div><b>⌄</b></summary>
                 <div class="dossier-body">
                   <label class="upload-zone" id="uploadZone"><input id="imageUpload" type="file" accept="image/*" multiple /><span class="upload-icon">＋</span><strong>Добавить изображения</strong><small>До 12 изображений · укажите тип и подпись к каждому</small></label>
@@ -175,7 +194,7 @@
                 </div>
               </details>
 
-              <details class="dossier-section" id="section-product" open>
+              <details class="dossier-section" id="section-product">
                 <summary><span class="step-number">04</span><div><h2>Изделие и образцы</h2><p>Примерка, дефекты, замеры и хронология</p></div><b>⌄</b></summary>
                 <div class="dossier-body">
                   <label><span>Мнение по образцам и примерке</span><textarea id="fittingNotes" data-dossier-field rows="5" placeholder="Как село изделие, что понравилось, что нужно изменить"></textarea></label>
@@ -187,7 +206,7 @@
                 </div>
               </details>
 
-              <details class="dossier-section" id="section-launch" open>
+              <details class="dossier-section" id="section-launch">
                 <summary><span class="step-number">05</span><div><h2>Экономика и запуск</h2><p>Себестоимость, ткань, размеры и первый заказ</p></div><b>⌄</b></summary>
                 <div class="dossier-body">
                   <div class="subsection-head"><div><h3>Экономика единицы</h3><p>Без сложных формул — только итоговые показатели</p></div><button class="small-button" id="addEconomic">＋ Показатель</button></div>
@@ -202,7 +221,7 @@
                 </div>
               </details>
 
-              <details class="dossier-section" id="section-final" open>
+              <details class="dossier-section" id="section-final">
                 <summary><span class="step-number">06</span><div><h2>Итог и карточка товара</h2><p>Решение, следующие шаги и готовое описание</p></div><b>⌄</b></summary>
                 <div class="dossier-body">
                   <label><span>Итоговое решение</span><textarea id="reportConclusion" data-dossier-field rows="4" placeholder="Запускаем, дорабатываем или отказываемся — и почему"></textarea></label>

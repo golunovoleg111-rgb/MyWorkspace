@@ -1,4 +1,5 @@
 import './styles.css';
+import './rest-zone.css';
 import { exportAnalyticsDocx } from './docx-export.js';
 import { initStoreAnalysis } from './store-ui.js';
 import { initWorkspaceModules, renderWorkspaceModule } from './workspace-modules.js';
@@ -6,7 +7,7 @@ import { initPetCompanion } from './pet.js';
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
-const sections = { home: 'Главная', files: 'Мои файлы', products: 'Карточки товаров', analytics: 'Аналитика', store: 'Анализ магазина', history: 'История анализов', stock: 'Контроль остатков', calendar: 'Календарь', finance: 'Финансы товара', knowledge: 'База знаний', fbs: 'FBS · Таблицы' };
+const sections = { home: 'Главная', files: 'Мои файлы', products: 'Карточки товаров', analytics: 'Аналитика', store: 'Анализ магазина', history: 'История анализов', stock: 'Контроль остатков', calendar: 'Календарь', finance: 'Финансы товара', knowledge: 'База знаний', fbs: 'FBS · Таблицы', rest: 'Дом питомцев' };
 const keys = { files: 'myworkspace.files.v1', draft: 'myworkspace.analytics.v1', profile: 'myworkspace.profile.v1', tour: 'myworkspace.tour.v1' };
 let files = load(keys.files, []);
 let activeFileId = null;
@@ -447,7 +448,7 @@ function registerWebMcp() {
   if (!navigator.modelContext?.registerTool) return;
   navigator.modelContext.registerTool({
     name: 'open_workspace_section', description: 'Открывает раздел MyWorkspace',
-    inputSchema: { type: 'object', properties: { section: { type: 'string', enum: ['home', 'files', 'products', 'analytics', 'store', 'history', 'stock', 'calendar', 'finance', 'knowledge', 'fbs'] } }, required: ['section'] },
+    inputSchema: { type: 'object', properties: { section: { type: 'string', enum: ['home', 'files', 'products', 'analytics', 'store', 'history', 'stock', 'calendar', 'finance', 'knowledge', 'fbs', 'rest'] } }, required: ['section'] },
     execute: ({ section }) => { switchView(section); return { content: [{ type: 'text', text: `Открыт раздел ${sections[section]}` }] }; }
   });
 }
@@ -503,6 +504,12 @@ $('#exportPdf').addEventListener('click', () => { buildReport(false); window.pri
 
 $('#today').textContent = new Intl.DateTimeFormat('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date());
 $('#reportPreview').innerHTML = reportMarkup(reportData()); updateRevenueSummary();
+let restZoneReady;
+function loadRestZone() {
+  if (!restZoneReady) restZoneReady = import('./rest-zone.js').then(({ initRestZone }) => initRestZone({ toast })).catch((error) => { console.error(error); toast('Не удалось загрузить 3D-зону'); });
+  return restZoneReady;
+}
+$('[data-view="rest"]').addEventListener('click', loadRestZone);
 updateFileCounts(); renderFiles(); loadDraft(); updateProgress(); updateProfileUi(); initStoreAnalysis(); initWorkspaceModules({ toast, switchView }); initPetCompanion({ toast }); registerWebMcp();
 window.setTimeout(() => {
   $('#welcome')?.remove();

@@ -239,6 +239,7 @@ export function initPetCompanion({ toast }) {
   function setRuntimeMode(mode) {
     runtime3D.setMode(mode);
     root.classList.toggle('is-walking', mode === 'walk');
+    root.classList.toggle('is-turning', mode === 'turn');
     root.classList.toggle('is-observing', mode === 'observe');
   }
 
@@ -252,13 +253,18 @@ export function initPetCompanion({ toast }) {
       const target = min + Math.random() * (max - min);
       const speed = pet.personality === 'playful' ? 115 : pet.personality === 'calm' ? 58 : 82;
       const duration = Math.max(900, Math.min(6200, Math.abs(target - petX) / speed * 1000));
-      setRuntimeMode('walk');
-      applyPetPosition(target, duration);
+      runtime3D.setDirection(target >= petX ? 1 : -1);
+      setRuntimeMode('turn');
       window.clearTimeout(walkEndTimer);
       walkEndTimer = window.setTimeout(() => {
-        setRuntimeMode('idle');
-        scheduleWalk();
-      }, duration);
+        if (!pet?.enabled || currentView === 'analytics' || currentView === 'rest') return;
+        setRuntimeMode('walk');
+        applyPetPosition(target, duration);
+        walkEndTimer = window.setTimeout(() => {
+          setRuntimeMode('idle');
+          scheduleWalk();
+        }, duration);
+      }, 430);
     }, delay ?? pauses[pet.personality] ?? pauses.helper);
   }
 
@@ -389,7 +395,7 @@ export function initPetCompanion({ toast }) {
     stats.forEach(([label, value, color]) => {
       const card = document.createElement('div');
       card.className = 'pet-stat';
-      card.innerHTML = `<div><strong>${label}</strong><span>${Math.round(value)}%</span></div><i><b style="width:${Math.round(value)}%;background:${color}"></b></i>`;
+      card.innerHTML = `<div class="pet-stat-head"><strong>${label}</strong><span>${Math.round(value)}%</span></div><div class="pet-stat-track"><i style="width:${Math.round(value)}%;background:${color}"></i></div>`;
       grid.append(card);
     });
     document.querySelector('#petBondLevel').textContent = `Уровень дружбы ${friendshipLevel()}`;
@@ -604,6 +610,14 @@ export function initPetCompanion({ toast }) {
     window.clearTimeout(walkTimer);
     window.clearTimeout(walkEndTimer);
     if (!pet?.enabled || !hub.classList.contains('is-hidden')) return;
+    if (name === 'rest') {
+      root.classList.add('is-hidden');
+      runtime3D.setActive(false);
+      hideMessage();
+      return;
+    }
+    root.classList.remove('is-hidden');
+    runtime3D.setActive(!reduceMotion);
     if (name === 'analytics') {
       setRuntimeMode('observe');
       applyPetPosition(window.innerWidth - (window.innerWidth > 760 ? 174 : 108), 750);

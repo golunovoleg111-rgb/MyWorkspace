@@ -140,7 +140,7 @@ function createTail(config, shape, coatMat, accentMat, nodes) {
   return group;
 }
 
-function buildPet(config) {
+export function buildPet(config) {
   const species = config.species === 'cat' ? 'cat' : 'dog';
   const shape = BREED_SHAPES[species][config.breed] || Object.values(BREED_SHAPES[species])[0];
   const coat = hex(config.coat, '#d49a60');
@@ -436,6 +436,7 @@ class Pet3DView {
   animate(time, delta) {
     const nodes = this.pet.userData.nodes;
     const walking = this.mode === 'walk';
+    const turning = this.mode === 'turn';
     const observing = this.mode === 'observe';
     const studio = this.mode === 'studio';
     const resting = this.mode === 'sleep';
@@ -444,7 +445,7 @@ class Pet3DView {
     this.orbit += (this.orbitTarget - this.orbit) * (1 - Math.pow(.003, delta));
     const yawTarget = studio || atHome
       ? this.orbit + this.look.x * .08
-      : walking
+      : walking || turning
         ? this.direction * 1.18
         : this.look.x * .08;
     this.yaw += (yawTarget - this.yaw) * (1 - Math.pow(walking ? .0007 : .006, delta));
@@ -459,7 +460,7 @@ class Pet3DView {
     nodes.head.position.y += ((resting ? .82 : observing ? 1.64 : 1.78) - nodes.head.position.y) * (1 - Math.pow(.004, delta));
     nodes.head.position.z += ((resting ? .7 : .38) - nodes.head.position.z) * (1 - Math.pow(.004, delta));
     nodes.body.scale.set(1 - breath * .22, 1 + breath, 1 - breath * .22);
-    nodes.body.rotation.z = resting ? -.28 : walking ? step * .035 : Math.sin(time * .85) * .008;
+    nodes.body.rotation.z = resting ? -.28 : walking ? step * .035 : turning ? Math.sin(time * 5) * .018 : Math.sin(time * .85) * .008;
     nodes.head.rotation.y = walking ? 0 : this.look.x * .24;
     nodes.head.rotation.x = resting ? -.18 : -this.look.y * .13 + (observing ? -.035 : 0);
     nodes.head.rotation.z = resting ? -.32 : observing ? -.055 + Math.sin(time * .9) * .018 : Math.sin(time * .7) * .012;

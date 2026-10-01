@@ -58,6 +58,8 @@
           <button class="nav-item" data-view="finance"><svg class="nav-icon"><use href="#icon-finance"/></svg><span>Финансы товара</span></button>
           <button class="nav-item" data-view="knowledge"><svg class="nav-icon"><use href="#icon-knowledge"/></svg><span>База знаний</span></button>
           <button class="nav-item" data-view="fbs"><svg class="nav-icon"><use href="#icon-table"/></svg><span>FBS · Таблицы</span></button>
+          <span class="nav-group-label">ЗОНА ОТДЫХА</span>
+          <button class="nav-item nav-rest" data-view="rest"><svg class="nav-icon"><use href="#icon-sparkles"/></svg><span>Дом питомцев</span><span class="nav-live-dot" aria-hidden="true"></span></button>
         </nav>
 
         <div class="sidebar-note">
@@ -65,7 +67,7 @@
           <div><strong>Всё работает локально</strong><p>Данные остаются на этом устройстве</p></div>
         </div>
         <button class="tour-restart" id="restartTour"><span>?</span><div><strong>Обучение</strong><small>Повторить подсказки</small></div></button>
-        <div class="sidebar-footer">v1.6.1 · Companion</div>
+        <div class="sidebar-footer">v2.0 · Living Space</div>
       </aside>
 
       <main class="workspace">
@@ -294,6 +296,49 @@
         <section class="view" id="view-knowledge">
           <div class="page-heading compact-heading module-heading"><div><p class="eyebrow">ИНСТРУКЦИИ И ШАБЛОНЫ</p><h1>База знаний</h1><p>Рабочие регламенты, чек-листы и собственные инструкции в одном месте.</p></div><button class="primary-action" id="addKnowledge">＋ Новая инструкция</button></div>
           <div id="knowledgeWorkspace"></div>
+        </section>
+
+        <section class="view rest-view" id="view-rest">
+          <div class="rest-shell">
+            <div class="rest-stage" id="restStage">
+              <div class="rest-canvas" id="restCanvas" aria-label="Интерактивная трёхмерная комната питомца"></div>
+              <div class="rest-stage-shade"></div>
+              <header class="rest-stage-head">
+                <div><p class="eyebrow">MYWORKSPACE · LIVING SPACE</p><h1>Дом питомцев</h1><p>Личное пространство для короткой паузы и живого взаимодействия.</p></div>
+                <div class="rest-wallet"><span>НАГРАДЫ</span><strong><i>✦</i><b id="restCoins">0</b></strong></div>
+              </header>
+              <div class="rest-pet-status">
+                <span class="rest-avatar">✦</span><div><small id="restPetMood">РАД ВАС ВИДЕТЬ</small><strong id="restPetName">Ваш друг</strong><p id="restPetState">Исследует комнату</p></div>
+              </div>
+              <div class="rest-scene-hint" id="restSceneHint"><span>↗</span><p><strong>Комната интерактивна</strong>Нажимайте на мяч, миску, лежанку, окно и светильник.</p></div>
+              <div class="rest-action-dock" aria-label="Действия с питомцем">
+                <button type="button" data-rest-action="call"><span>♡</span><b>Позвать</b></button>
+                <button type="button" data-rest-action="ball"><span>●</span><b>Бросить мяч</b></button>
+                <button type="button" data-rest-action="feed"><span>◒</span><b>Угостить</b></button>
+                <button type="button" data-rest-action="paw"><span>♧</span><b>Дать лапу</b></button>
+                <button type="button" data-rest-action="sleep"><span>☾</span><b>Отдых</b></button>
+              </div>
+              <div class="rest-loading" id="restLoading"><span></span><strong>Создаём пространство</strong><small>Свет · материалы · анимации</small></div>
+            </div>
+            <aside class="rest-panel">
+              <nav class="rest-tabs" aria-label="Панель зоны отдыха"><button class="is-active" type="button" data-rest-tab="today">Сегодня</button><button type="button" data-rest-tab="shop">Магазин</button><button type="button" data-rest-tab="interior">Интерьер</button></nav>
+              <section class="rest-panel-view is-active" data-rest-panel="today">
+                <div class="rest-panel-title"><p class="eyebrow">НЕБОЛЬШИЕ ЦЕЛИ</p><h2>Сегодня вместе</h2><span id="restDailyProgress">0 / 3</span></div>
+                <div class="rest-dailies" id="restDailies"></div>
+                <div class="rest-needs"><div><span>Настроение</span><b id="restMoodValue">82%</b><i><em id="restMoodBar"></em></i></div><div><span>Энергия</span><b id="restEnergyValue">76%</b><i><em id="restEnergyBar"></em></i></div><div><span>Сытость</span><b id="restHungerValue">72%</b><i><em id="restHungerBar"></em></i></div></div>
+                <div class="rest-journal"><span>ДНЕВНИК</span><p id="restJournal">Здесь появятся маленькие события вашего общего дня.</p></div>
+              </section>
+              <section class="rest-panel-view" data-rest-panel="shop">
+                <div class="rest-panel-title"><p class="eyebrow">КОЛЛЕКЦИЯ</p><h2>Предметы для дома</h2><span>без доната</span></div>
+                <div class="rest-shop" id="restShop"></div>
+              </section>
+              <section class="rest-panel-view" data-rest-panel="interior">
+                <div class="rest-panel-title"><p class="eyebrow">АТМОСФЕРА</p><h2>Настроение комнаты</h2><span>3 сцены</span></div>
+                <div class="rest-themes"><button type="button" class="is-active" data-rest-theme="day"><span class="theme-day"></span><strong>Светлый день</strong><small>Спокойный рабочий ритм</small></button><button type="button" data-rest-theme="evening"><span class="theme-evening"></span><strong>Тёплый вечер</strong><small>Мягкий свет и камин</small></button><button type="button" data-rest-theme="night"><span class="theme-night"></span><strong>Звёздная ночь</strong><small>Неон и глубокое небо</small></button></div>
+                <div class="rest-quality"><div><strong>Живая сцена</strong><small>Динамический свет, частицы и тени</small></div><span>60 FPS</span></div>
+              </section>
+            </aside>
+          </div>
         </section>
 
         <section class="view" id="view-fbs">

@@ -77,7 +77,7 @@ function segmentBetween(start, end, radius, mat) {
 
 function createEye(x, config, eyeWhite, irisMat, blackMat, nodes) {
   const group = new THREE.Group();
-  group.position.set(x, 1.8, .61);
+  group.position.set(x, .02, .52);
   const eyeStyle = config.eyeStyle || 'bright';
   const eyeScale = eyeStyle === 'almond' ? [1.08, .72, .6] : eyeStyle === 'round' ? [.92, 1.04, .62] : [1, 1, .62];
   const white = sphere(.145, eyeWhite, [0, 0, 0], eyeScale, 22);
@@ -258,7 +258,6 @@ function buildPet(config) {
 
   head.add(createEye(-.22, config, eyeWhite, irisMat, blackMat, nodes));
   head.add(createEye(.22, config, eyeWhite, irisMat, blackMat, nodes));
-  nodes.eyes.forEach((eye) => { eye.position.y -= 1.78; eye.position.z -= .38; });
 
   if (species === 'cat') {
     const whiskerMat = new THREE.MeshBasicMaterial({ color: '#475569', transparent: true, opacity: .72 });
@@ -446,7 +445,7 @@ class Pet3DView {
     const yawTarget = studio || atHome
       ? this.orbit + this.look.x * .08
       : walking
-        ? this.direction * -1.18
+        ? this.direction * 1.18
         : this.look.x * .08;
     this.yaw += (yawTarget - this.yaw) * (1 - Math.pow(walking ? .0007 : .006, delta));
 

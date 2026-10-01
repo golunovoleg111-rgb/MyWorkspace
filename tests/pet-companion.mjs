@@ -23,6 +23,9 @@ for (const feature of ['LIFE_KEY', 'startBreathing', 'applyCare', 'petReply', 'r
 
 assert.match(pet3d, /setDirection\(direction/);
 assert.match(pet3d, /\[1, -1, -1, 1\]/);
+assert.match(pet3d, /group\.position\.set\(x, \.02, \.52\)/);
+assert.match(pet3d, /\? this\.direction \* 1\.18/);
+assert.doesNotMatch(pet3d, /nodes\.eyes\.forEach\(\(eye\) => \{ eye\.position\.y -=/);
 assert.match(css, /\.pet-room\.is-plant-hidden/);
 assert.match(css, /\.pet-runtime-art[^\n]*transform: none/);
 

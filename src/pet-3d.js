@@ -5,16 +5,24 @@ const yAxis = new THREE.Vector3(0, 1, 0);
 
 const BREED_SHAPES = {
   dog: {
-    spitz: { body: [0.82, 0.88, 0.76], head: 1.04, legs: 0.92, muzzle: 0.84, ears: 'pointed', mane: true, fluffyTail: true },
-    corgi: { body: [1.08, 0.72, 0.82], head: 1.02, legs: 0.64, muzzle: 0.88, ears: 'large', mane: false, fluffyTail: false },
-    shiba: { body: [0.9, 0.82, 0.8], head: 0.98, legs: 0.88, muzzle: 0.94, ears: 'pointed', mane: false, fluffyTail: true },
-    labrador: { body: [1.02, 0.92, 0.88], head: 0.96, legs: 1.02, muzzle: 1.08, ears: 'floppy', mane: false, fluffyTail: false }
+    spitz: { body: [0.82, 0.88, 1.02], head: 1.04, legs: 0.92, muzzle: 0.84, ears: 'pointed', mane: true, fluffyTail: true },
+    corgi: { body: [1.02, 0.72, 1.34], head: 1.02, legs: 0.64, muzzle: 0.88, ears: 'large', mane: false, fluffyTail: false },
+    shiba: { body: [0.9, 0.82, 1.08], head: 0.98, legs: 0.88, muzzle: 0.94, ears: 'pointed', mane: false, fluffyTail: true },
+    labrador: { body: [1.0, 0.92, 1.28], head: 0.96, legs: 1.02, muzzle: 1.08, ears: 'floppy', mane: false, fluffyTail: false },
+    samoyed: { body: [0.94, 1, 1.16], head: 1.06, legs: .98, muzzle: .9, ears: 'pointed', mane: true, fluffyTail: true },
+    dachshund: { body: [.82, .66, 1.58], head: .9, legs: .54, muzzle: 1.08, ears: 'floppy', mane: false, fluffyTail: false },
+    poodle: { body: [.84, .92, 1.12], head: .96, legs: 1.08, muzzle: .92, ears: 'floppy', mane: false, fluffyTail: true, curls: true },
+    beagle: { body: [.9, .82, 1.28], head: .94, legs: .9, muzzle: 1.04, ears: 'floppy', mane: false, fluffyTail: false, patches: true }
   },
   cat: {
-    british: { body: [0.88, 0.9, 0.82], head: 1.08, legs: 0.84, muzzle: 0.92, ears: 'round', mane: false, fluffyTail: true },
-    maine: { body: [1.0, 1.0, 0.88], head: 1.02, legs: 1.08, muzzle: 1, ears: 'tufted', mane: true, fluffyTail: true },
-    siamese: { body: [0.76, 1.02, 0.7], head: 0.9, legs: 1.14, muzzle: 0.82, ears: 'large', mane: false, fluffyTail: false },
-    domestic: { body: [0.86, 0.94, 0.78], head: 0.98, legs: 1, muzzle: 0.94, ears: 'pointed', mane: false, fluffyTail: false }
+    british: { body: [0.88, 0.9, 1.08], head: 1.08, legs: 0.84, muzzle: 0.92, ears: 'round', mane: false, fluffyTail: true },
+    maine: { body: [1, 1, 1.3], head: 1.02, legs: 1.08, muzzle: 1, ears: 'tufted', mane: true, fluffyTail: true },
+    siamese: { body: [0.76, 1.02, 1.24], head: 0.9, legs: 1.14, muzzle: 0.82, ears: 'large', mane: false, fluffyTail: false },
+    domestic: { body: [0.86, 0.94, 1.16], head: 0.98, legs: 1, muzzle: 0.94, ears: 'pointed', mane: false, fluffyTail: false },
+    scottish: { body: [.9, .86, 1.08], head: 1.1, legs: .84, muzzle: .9, ears: 'folded', mane: false, fluffyTail: true },
+    sphynx: { body: [.72, 1, 1.18], head: .88, legs: 1.14, muzzle: .78, ears: 'large', mane: false, fluffyTail: false },
+    ragdoll: { body: [.96, .98, 1.24], head: 1.04, legs: .96, muzzle: .94, ears: 'pointed', mane: true, fluffyTail: true },
+    bengal: { body: [.78, .92, 1.34], head: .9, legs: 1.12, muzzle: .86, ears: 'pointed', mane: false, fluffyTail: false, spots: true }
   }
 };
 
@@ -45,7 +53,7 @@ function mesh(geometry, mat, position = [0, 0, 0], scale = [1, 1, 1], rotation =
   return item;
 }
 
-function sphere(radius, mat, position, scale = [1, 1, 1], detail = 24) {
+function sphere(radius, mat, position, scale = [1, 1, 1], detail = 28) {
   return mesh(new THREE.SphereGeometry(radius, detail, Math.max(12, Math.round(detail * .66))), mat, position, scale);
 }
 
@@ -86,11 +94,12 @@ function createPointedEar(side, type, coatMat, innerMat, nodes) {
   const group = new THREE.Group();
   const large = type === 'large';
   const tufted = type === 'tufted';
-  const short = type === 'round';
+  const folded = type === 'folded';
+  const short = type === 'round' || folded;
   group.position.set(side * (large ? .43 : .38), short ? 2.2 : 2.27, .08);
-  group.rotation.z = side * (large ? -.2 : -.13);
+  group.rotation.z = side * (folded ? .48 : large ? -.2 : -.13);
   const outer = short
-    ? sphere(.25, coatMat, [0, 0, 0], [.82, .85, .55], 18)
+    ? sphere(.25, coatMat, [0, 0, 0], [folded ? 1 : .82, folded ? .58 : .85, .55], 22)
     : cone(large ? .3 : .25, large ? .72 : .62, coatMat, [0, .04, 0], [1, 1, .72], [0, 0, 0]);
   const inner = short
     ? sphere(.15, innerMat, [0, .005, .13], [.8, .8, .28], 16)
@@ -115,14 +124,14 @@ function createFloppyEar(side, coatMat, innerMat, nodes) {
 
 function createTail(config, shape, coatMat, accentMat, nodes) {
   const group = new THREE.Group();
-  group.position.set(.58, 1.02, -.32);
+  group.position.set(.34, 1.02, -.62);
   const cat = config.species === 'cat';
   const fluffy = shape.fluffyTail;
   const points = cat
-    ? [[0, 0, 0], [.28, .08, -.05], [.43, .32, -.04], [.34, .58, .03], [.15, .74, .12]]
+    ? [[0, 0, 0], [.08, .08, -.28], [.16, .32, -.48], [.12, .6, -.42], [.02, .78, -.2]]
     : fluffy
-      ? [[0, 0, 0], [.25, .1, -.03], [.39, .33, .02], [.23, .52, .1], [.02, .45, .18]]
-      : [[0, 0, 0], [.28, .08, -.04], [.5, .21, -.02], [.64, .34, .03]];
+      ? [[0, 0, 0], [.12, .12, -.24], [.22, .38, -.3], [.12, .58, -.08], [-.04, .5, .12]]
+      : [[0, 0, 0], [.08, .08, -.28], [.12, .2, -.54], [.08, .34, -.72]];
   for (let i = 0; i < points.length - 1; i += 1) {
     const radius = (cat ? .105 : .12) * (fluffy ? 1.34 : 1) * (1 - i * .08);
     group.add(segmentBetween(points[i], points[i + 1], radius, i === points.length - 2 && config.breed === 'siamese' ? accentMat : coatMat));
@@ -149,9 +158,31 @@ function buildPet(config) {
   const nodes = { root, model, body: null, head: null, tail: null, legs: [], ears: [], eyes: [], pupils: [] };
 
   const body = new THREE.Group();
-  body.position.set(0, .88, -.15);
-  const torso = sphere(.72, coatMat, [0, 0, 0], shape.body, 28);
+  body.position.set(0, .88, -.22);
+  const torso = sphere(.72, coatMat, [0, 0, 0], shape.body, 32);
   body.add(torso);
+  if (config.marking === 'patches' || shape.patches) {
+    body.add(sphere(.3, accentMat, [-.34, .14, .62], [1.05, .86, .2], 22));
+    body.add(sphere(.24, accentMat, [.28, -.22, .65], [.9, .7, .18], 20));
+  }
+  if (config.marking === 'tabby' || shape.spots) {
+    const stripeMat = material(accent, { roughness: .82 });
+    [-.3, 0, .3].forEach((x, index) => {
+      body.add(capsule(.035, .34, stripeMat, [x, .28 - Math.abs(x) * .25, .68], [1, 1, .36], [0, 0, index === 1 ? 0 : x * .55]));
+    });
+    if (shape.spots) {
+      [[-.32, -.05], [.05, .16], [.34, -.12]].forEach(([x, y]) => body.add(sphere(.08, stripeMat, [x, y, .7], [1.25, .72, .2], 16)));
+    }
+  }
+  if (shape.curls) {
+    const curlGroup = new THREE.Group();
+    for (let row = -1; row <= 1; row += 1) {
+      for (let col = -2; col <= 2; col += 1) {
+        curlGroup.add(sphere(.115, coatMat, [col * .22, row * .22, .67], [1, 1, .45], 16));
+      }
+    }
+    body.add(curlGroup);
+  }
   nodes.body = body;
   model.add(body);
 
@@ -172,20 +203,22 @@ function buildPet(config) {
 
   const pawMat = config.marking === 'socks' || config.breed === 'siamese' ? accentMat : coatMat;
   const legX = shape.body[0] * .38;
-  [-1, 1].forEach((side, index) => {
+  const legDepth = Math.min(.46, shape.body[2] * .28);
+  [[-1, 1], [1, 1], [-1, -1], [1, -1]].forEach(([side, depth], index) => {
     const leg = new THREE.Group();
-    leg.position.set(side * legX, .66, .1);
+    leg.position.set(side * legX, .66, depth * legDepth - .16);
     const legLength = .43 * shape.legs;
     leg.add(capsule(.12, legLength, coatMat, [0, -legLength * .48, 0], [.96, 1, .9]));
-    leg.add(sphere(.18, pawMat, [0, -legLength - .05, .09], [1.12, .65, 1.28], 18));
+    leg.add(sphere(.18, pawMat, [0, -legLength - .05, .09], [1.12, .65, 1.32], 20));
     leg.userData.side = side;
+    leg.userData.depth = depth;
     leg.userData.index = index;
     nodes.legs.push(leg);
     model.add(leg);
   });
 
   const head = new THREE.Group();
-  head.position.set(0, 1.78, .14);
+  head.position.set(0, 1.78, .38);
   head.scale.setScalar(shape.head);
   head.add(sphere(.6, coatMat, [0, 0, 0], species === 'cat' ? [1.02, .92, .94] : [1, 1, .96], 30));
   nodes.head = head;
@@ -197,7 +230,7 @@ function buildPet(config) {
   } else {
     head.add(createPointedEar(-1, earType, coatMat, innerMat, nodes), createPointedEar(1, earType, coatMat, innerMat, nodes));
   }
-  nodes.ears.forEach((ear) => { ear.position.y -= 1.78; ear.position.z -= .14; });
+  nodes.ears.forEach((ear) => { ear.position.y -= 1.78; ear.position.z -= .38; });
 
   if (config.marking === 'mask' || config.breed === 'siamese') {
     head.add(sphere(.235, accentMat, [-.22, .02, .49], [1.12, .72, .28], 20));
@@ -205,6 +238,12 @@ function buildPet(config) {
   }
   if (config.marking === 'blaze') {
     head.add(sphere(.18, accentMat, [0, .22, .49], [.5, 1.38, .25], 20));
+  }
+  if (config.marking === 'tabby') {
+    [-.13, 0, .13].forEach((x) => head.add(capsule(.018, .22, accentMat, [x, .31, .52], [1, 1, .28], [0, 0, x * 1.7])));
+  }
+  if (config.marking === 'patches') {
+    head.add(sphere(.24, accentMat, [-.3, .12, .48], [1.05, .9, .25], 20));
   }
 
   const muzzleMat = config.marking === 'solid' ? coatMat : accentMat;
@@ -219,7 +258,7 @@ function buildPet(config) {
 
   head.add(createEye(-.22, config, eyeWhite, irisMat, blackMat, nodes));
   head.add(createEye(.22, config, eyeWhite, irisMat, blackMat, nodes));
-  nodes.eyes.forEach((eye) => { eye.position.y -= 1.78; eye.position.z -= .14; });
+  nodes.eyes.forEach((eye) => { eye.position.y -= 1.78; eye.position.z -= .38; });
 
   if (species === 'cat') {
     const whiskerMat = new THREE.MeshBasicMaterial({ color: '#475569', transparent: true, opacity: .72 });
@@ -237,9 +276,9 @@ function buildPet(config) {
   const accessory = config.accessory || 'blue';
   if (accessory !== 'none') {
     const accessoryMat = material(ACCESSORY_COLORS[accessory] || ACCESSORY_COLORS.blue, { roughness: .48 });
-    const collar = mesh(new THREE.TorusGeometry(.43, .045, 10, 32), accessoryMat, [0, 1.31, .06], [1, .88, 1], [Math.PI / 2, 0, 0]);
+    const collar = mesh(new THREE.TorusGeometry(.43, .045, 12, 40), accessoryMat, [0, 1.31, .21], [1, .88, 1], [Math.PI / 2, 0, 0]);
     const tagMat = material('#f2c96d', { roughness: .3, metalness: .45 });
-    const tag = sphere(.09, tagMat, [0, 1.2, .47], [1, 1.06, .38], 18);
+    const tag = sphere(.09, tagMat, [0, 1.2, .63], [1, 1.06, .38], 20);
     model.add(collar, tag);
     nodes.tag = tag;
   }
@@ -261,6 +300,8 @@ class Pet3DView {
     this.look = new THREE.Vector2();
     this.orbitTarget = preview ? -.16 : 0;
     this.orbit = this.orbitTarget;
+    this.direction = 1;
+    this.yaw = this.orbitTarget;
     this.reaction = null;
     this.lastTime = 0;
     this.frame = this.frame.bind(this);
@@ -357,6 +398,10 @@ class Pet3DView {
     this.mode = mode || 'idle';
   }
 
+  setDirection(direction = 1) {
+    this.direction = direction >= 0 ? 1 : -1;
+  }
+
   setLook(x, y) {
     this.lookTarget.set(clamp(x, -1, 1), clamp(y, -1, 1));
   }
@@ -394,26 +439,37 @@ class Pet3DView {
     const walking = this.mode === 'walk';
     const observing = this.mode === 'observe';
     const studio = this.mode === 'studio';
+    const resting = this.mode === 'sleep';
+    const atHome = this.mode === 'house';
     this.look.lerp(this.lookTarget, 1 - Math.pow(.002, delta));
     this.orbit += (this.orbitTarget - this.orbit) * (1 - Math.pow(.003, delta));
+    const yawTarget = studio || atHome
+      ? this.orbit + this.look.x * .08
+      : walking
+        ? this.direction * -1.18
+        : this.look.x * .08;
+    this.yaw += (yawTarget - this.yaw) * (1 - Math.pow(walking ? .0007 : .006, delta));
 
     const breath = Math.sin(time * 2.2) * .018;
     const step = Math.sin(time * 9.4);
     const hop = walking ? Math.abs(Math.sin(time * 9.4)) * .065 : 0;
     nodes.root.position.y = hop;
-    nodes.root.rotation.y = this.orbit + this.look.x * (studio ? .08 : .035);
-    nodes.body.position.y += ((observing ? .7 : .88) - nodes.body.position.y) * (1 - Math.pow(.004, delta));
-    nodes.head.position.y += ((observing ? 1.64 : 1.78) - nodes.head.position.y) * (1 - Math.pow(.004, delta));
+    nodes.root.rotation.y = this.yaw;
+    nodes.root.rotation.z *= Math.pow(.002, delta);
+    nodes.body.position.y += ((resting ? .43 : observing ? .7 : .88) - nodes.body.position.y) * (1 - Math.pow(.004, delta));
+    nodes.head.position.y += ((resting ? .82 : observing ? 1.64 : 1.78) - nodes.head.position.y) * (1 - Math.pow(.004, delta));
+    nodes.head.position.z += ((resting ? .7 : .38) - nodes.head.position.z) * (1 - Math.pow(.004, delta));
     nodes.body.scale.set(1 - breath * .22, 1 + breath, 1 - breath * .22);
-    nodes.body.rotation.z = walking ? step * .035 : Math.sin(time * .85) * .008;
-    nodes.head.rotation.y = this.look.x * .24;
-    nodes.head.rotation.x = -this.look.y * .13 + (observing ? -.035 : 0);
-    nodes.head.rotation.z = observing ? -.055 + Math.sin(time * .9) * .018 : Math.sin(time * .7) * .012;
+    nodes.body.rotation.z = resting ? -.28 : walking ? step * .035 : Math.sin(time * .85) * .008;
+    nodes.head.rotation.y = walking ? 0 : this.look.x * .24;
+    nodes.head.rotation.x = resting ? -.18 : -this.look.y * .13 + (observing ? -.035 : 0);
+    nodes.head.rotation.z = resting ? -.32 : observing ? -.055 + Math.sin(time * .9) * .018 : Math.sin(time * .7) * .012;
 
     nodes.legs.forEach((leg, index) => {
-      leg.rotation.x = walking ? step * (index ? -.34 : .34) : 0;
-      leg.rotation.z = observing ? (index ? -.14 : .14) : 0;
-      leg.position.y += ((observing ? .48 : .66) - leg.position.y) * (1 - Math.pow(.004, delta));
+      const gait = [1, -1, -1, 1][index] || 1;
+      leg.rotation.x = walking ? step * gait * .48 : resting ? -.72 : 0;
+      leg.rotation.z = observing ? (leg.userData.side > 0 ? -.14 : .14) : resting ? leg.userData.side * .24 : 0;
+      leg.position.y += ((resting ? .35 : observing ? .48 : .66) - leg.position.y) * (1 - Math.pow(.004, delta));
     });
     if (nodes.tail) {
       nodes.tail.rotation.z = Math.sin(time * (walking ? 6.2 : 3.1)) * (walking ? .24 : .16) + (observing ? .16 : 0);
@@ -424,7 +480,7 @@ class Pet3DView {
     });
 
     const blinkPhase = time % 4.6;
-    const blink = blinkPhase > 4.34 ? Math.max(.08, Math.abs((blinkPhase - 4.47) / .13)) : 1;
+    const blink = resting ? .08 : blinkPhase > 4.34 ? Math.max(.08, Math.abs((blinkPhase - 4.47) / .13)) : 1;
     nodes.eyes.forEach((eye) => { eye.scale.y = blink; });
     nodes.pupils.forEach((pupil) => {
       const baseX = pupil.userData.baseX ?? pupil.position.x;
@@ -442,6 +498,16 @@ class Pet3DView {
         nodes.root.position.y += Math.sin(progress * Math.PI) * .42;
         nodes.root.rotation.z = Math.sin(progress * TAU) * .09;
         if (nodes.tail) nodes.tail.rotation.z += Math.sin(progress * TAU * 3) * .3;
+      } else if (this.reaction.type === 'play') {
+        nodes.root.position.y += Math.sin(progress * Math.PI) * .5;
+        nodes.root.rotation.y += Math.sin(progress * Math.PI) * TAU;
+        if (nodes.tail) nodes.tail.rotation.z += Math.sin(progress * TAU * 4) * .42;
+      } else if (this.reaction.type === 'feed') {
+        nodes.head.rotation.x += Math.sin(progress * TAU * 3) * .16;
+        nodes.body.scale.multiplyScalar(1 + Math.sin(progress * Math.PI) * .035);
+      } else if (this.reaction.type === 'pet') {
+        nodes.head.rotation.z += Math.sin(progress * Math.PI) * .16;
+        if (nodes.tail) nodes.tail.rotation.z += Math.sin(progress * TAU * 5) * .34;
       } else {
         nodes.head.rotation.z += Math.sin(progress * Math.PI) * .18;
       }
@@ -467,7 +533,7 @@ export function createPet3DView(container, options) {
     console.warn('3D pet is unavailable', error);
     container.innerHTML = '<span class="pet-3d-fallback" aria-hidden="true">🐾</span>';
     return {
-      setConfig() {}, setMode() {}, setLook() {}, react() {}, setActive() {}, destroy() {}
+      setConfig() {}, setMode() {}, setDirection() {}, setLook() {}, react() {}, setActive() {}, destroy() {}
     };
   }
 }

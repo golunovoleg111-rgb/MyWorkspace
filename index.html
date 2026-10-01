@@ -65,7 +65,7 @@
           <div><strong>Всё работает локально</strong><p>Данные остаются на этом устройстве</p></div>
         </div>
         <button class="tour-restart" id="restartTour"><span>?</span><div><strong>Обучение</strong><small>Повторить подсказки</small></div></button>
-        <div class="sidebar-footer">v1.5 · 3D Sim-Pet</div>
+        <div class="sidebar-footer">v1.6 · Companion</div>
       </aside>
 
       <main class="workspace">
@@ -331,7 +331,7 @@
             <fieldset><legend>Кого создаём</legend><div class="pet-species-switch"><label><input type="radio" name="petSpecies" value="dog" checked /><span>🐶 Собачка</span></label><label><input type="radio" name="petSpecies" value="cat" /><span>🐱 Котик</span></label></div></fieldset>
             <div class="pet-form-grid two"><label><span>Имя питомца</span><input id="petName" maxlength="20" placeholder="Например, Тедди" required /></label><label><span>Порода</span><select id="petBreed"></select></label></div>
             <div class="pet-color-grid"><label><span>Основной окрас</span><input id="petCoat" type="color" value="#d49a60" /></label><label><span>Отметины</span><input id="petAccent" type="color" value="#fff1d4" /></label><label><span>Цвет глаз</span><input id="petEyes" type="color" value="#3d2b1f" /></label></div>
-            <div class="pet-form-grid two"><label><span>Рисунок окраса</span><select id="petMarking"><option value="muzzle">Светлая мордочка</option><option value="blaze">Полоска на лбу</option><option value="mask">Маска вокруг глаз</option><option value="socks">Светлые лапки</option><option value="solid">Однотонный</option></select></label><label><span>Форма глаз</span><select id="petEyeStyle"><option value="bright">Большие выразительные</option><option value="round">Круглые добрые</option><option value="almond">Миндалевидные</option></select></label></div>
+            <div class="pet-form-grid two"><label><span>Рисунок окраса</span><select id="petMarking"><option value="muzzle">Светлая мордочка</option><option value="blaze">Полоска на лбу</option><option value="mask">Маска вокруг глаз</option><option value="socks">Светлые лапки</option><option value="tabby">Полоски</option><option value="patches">Пятнышки</option><option value="solid">Однотонный</option></select></label><label><span>Форма глаз</span><select id="petEyeStyle"><option value="bright">Большие выразительные</option><option value="round">Круглые добрые</option><option value="almond">Миндалевидные</option></select></label></div>
             <div class="pet-form-grid two"><label><span>Аксессуар</span><select id="petAccessory"><option value="blue">Синий ошейник</option><option value="rose">Розовый ошейник</option><option value="mint">Мятный ошейник</option><option value="navy">Тёмный ошейник</option><option value="none">Без аксессуара</option></select></label><label><span>Характер</span><select id="petPersonality"><option value="helper">Заботливый помощник</option><option value="curious">Любопытный исследователь</option><option value="calm">Спокойный наблюдатель</option><option value="playful">Игривый непоседа</option></select></label></div>
             <label class="pet-enabled-toggle"><input id="petEnabled" type="checkbox" checked /><span><strong>Показывать питомца в MyWorkspace</strong><small>Настройку можно изменить в любой момент через профиль.</small></span></label>
           </div>
@@ -342,6 +342,35 @@
     <div class="pet-companion is-hidden" id="petCompanion" aria-live="polite">
       <div class="pet-message is-hidden" id="petMessage"><button type="button" id="closePetMessage" aria-label="Закрыть подсказку">×</button><strong id="petMessageName"></strong><p id="petMessageText"></p></div>
       <button class="pet-character" id="petCharacter" type="button" aria-label="Питомец"><span class="pet-runtime-art" id="petRuntimeArt"></span><span class="pet-name-tag" id="petNameTag"></span><span class="pet-heart" aria-hidden="true">♥</span></button>
+    </div>
+    <div class="pet-hub-backdrop is-hidden" id="petHub" role="dialog" aria-modal="true" aria-labelledby="petHubTitle">
+      <section class="pet-hub-panel">
+        <header class="pet-hub-head"><div><p class="eyebrow">MYWORKSPACE · COMPANION</p><h2 id="petHubTitle">Время с питомцем</h2><p id="petHubSubtitle">Небольшая пауза без выхода из рабочего пространства</p></div><button type="button" id="closePetHub" aria-label="Закрыть центр питомца">×</button></header>
+        <nav class="pet-hub-tabs" aria-label="Разделы питомца"><button class="is-active" type="button" data-pet-tab="talk">Диалог</button><button type="button" data-pet-tab="care">Забота</button><button type="button" data-pet-tab="home">Домик</button><button type="button" data-pet-tab="memories">Воспоминания</button></nav>
+        <div class="pet-hub-content">
+          <section class="pet-hub-view is-active" data-pet-view="talk">
+            <div class="pet-talk-hero"><div class="pet-hub-art" id="petHubArt"></div><div><span id="petMoodLabel">Рад вас видеть</span><strong id="petHubName">Ваш друг</strong><small id="petHubBreed"></small></div></div>
+            <div class="pet-chat-log" id="petChatLog" aria-live="polite"></div>
+            <div class="pet-topic-list" id="petTopicList"><button type="button" data-pet-topic="break">Хочу немного отдохнуть</button><button type="button" data-pet-topic="story">Расскажи историю</button><button type="button" data-pet-topic="work">Помоги с работой</button><button type="button" data-pet-topic="mood">Как ты себя чувствуешь?</button></div>
+            <form class="pet-chat-form" id="petChatForm"><input id="petChatInput" maxlength="180" autocomplete="off" placeholder="Напишите питомцу…" aria-label="Сообщение питомцу" /><button type="submit">Отправить</button></form>
+          </section>
+          <section class="pet-hub-view" data-pet-view="care">
+            <div class="pet-section-heading"><div><p class="eyebrow">СОСТОЯНИЕ</p><h3>Забота без обязательств</h3></div><span id="petBondLevel">Уровень дружбы 1</span></div>
+            <div class="pet-stat-grid" id="petStatGrid"></div>
+            <div class="pet-care-actions"><button type="button" data-care="feed"><span>🥨</span><strong>Угостить</strong><small>Сытость и настроение</small></button><button type="button" data-care="pet"><span>♡</span><strong>Погладить</strong><small>Доверие и дружба</small></button><button type="button" data-care="play"><span>●</span><strong>Поиграть</strong><small>Веселье и энергия</small></button><button type="button" data-care="rest"><span>☾</span><strong>Отдохнуть</strong><small>Восстановить силы</small></button></div>
+            <div class="pet-break-card"><div><span class="pet-breathe-orb" id="petBreatheOrb"></span><div><strong id="petBreakTitle">Минутка спокойствия</strong><small id="petBreakText">Подышите вместе с питомцем в течение минуты.</small></div></div><button type="button" id="startPetBreak">Начать</button></div>
+          </section>
+          <section class="pet-hub-view" data-pet-view="home">
+            <div class="pet-section-heading"><div><p class="eyebrow">ЛИЧНОЕ ПРОСТРАНСТВО</p><h3>Домик питомца</h3></div><span id="petHomeProgress">3 предмета</span></div>
+            <div class="pet-room" id="petRoom" data-theme="morning"><div class="pet-room-window"><i></i></div><div class="pet-room-shelf"><i></i><i></i><i></i></div><div class="pet-room-plant">✦</div><div class="pet-room-bed"></div><div class="pet-room-bowl"></div><div class="pet-room-toy"></div><div class="pet-room-art" id="petRoomArt"></div></div>
+            <div class="pet-home-controls"><fieldset><legend>Атмосфера</legend><div><button class="is-selected" type="button" data-room-theme="morning">Утро</button><button type="button" data-room-theme="evening">Вечер</button><button type="button" data-room-theme="forest">Лес</button></div></fieldset><fieldset><legend>Предметы</legend><div id="petFurnitureList"></div></fieldset></div>
+          </section>
+          <section class="pet-hub-view" data-pet-view="memories">
+            <div class="pet-section-heading"><div><p class="eyebrow">НАША ИСТОРИЯ</p><h3>Воспоминания и награды</h3></div><span id="petMemoryCount">0 событий</span></div>
+            <div class="pet-achievements" id="petAchievements"></div><div class="pet-memory-list" id="petMemoryList"></div>
+          </section>
+        </div>
+      </section>
     </div>
     <div class="tour-layer is-hidden" id="tourLayer" aria-live="polite">
       <div class="tour-shade"></div>

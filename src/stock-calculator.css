@@ -1,0 +1,45 @@
+/* MyWorkspace — stock minus active orders calculator */
+.mw-calc-layout {display:grid;grid-template-columns:minmax(0,1fr);gap:18px;max-width:1200px}
+.mw-calc-panel {background:#fff;border:1px solid var(--line,#dde2eb);border-radius:18px;padding:25px;box-shadow:0 12px 32px rgba(21,31,49,.04);min-width:0;display:grid;gap:22px}
+.mw-calc-section-head {display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.mw-calc-section-head h2,.mw-calc-section-head h3 {font-size:1.09rem;margin:0;line-height:1.4}
+.mw-calc-section-head>span {color:#8993a4;font-size:.73rem}
+.mw-calc-uploads {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.mw-calc-upload {display:grid;align-content:start;gap:8px;border:1.5px dashed #c5d5ec;border-radius:14px;background:#f9fbff;min-height:165px;padding:21px;cursor:pointer;position:relative;transition:.17s}
+.mw-calc-upload:hover,.mw-calc-upload:focus-within {border-color:#3b82f6;background:#f1f6ff}
+.mw-calc-upload-index {display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:#e8f1ff;color:#2563eb;font-size:.75rem;font-weight:800}
+.mw-calc-upload strong {color:#1d273b;font-size:.97rem}
+.mw-calc-upload small {font-size:.74rem;color:#718099;line-height:1.6}
+.mw-calc-input-label {display:block;margin-top:6px;padding:10px 12px;border:1px solid #d7e1ef;border-radius:9px;color:#2563eb;background:white;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:.78rem;font-weight:700}
+.mw-calc-upload input[type=file] {position:absolute;width:1px;height:1px;opacity:0;bottom:0;left:0}
+.mw-calc-muted {font-size:.77rem;line-height:1.7;color:#8490a2;margin:0}
+.mw-calc-reference {border-top:1px solid #e8edf4;padding-top:16px}
+.mw-calc-reference summary {font-weight:750;color:#334155;cursor:pointer}
+.mw-calc-reference p {margin:11px 0}
+.mw-calc-reference-row {display:flex;gap:14px;flex-wrap:wrap;align-items:end}
+.mw-calc-upload-small {min-height:0;max-width:440px;flex:1 1 280px}
+.mw-calc-reference-row .ghost-button {margin-bottom:3px}
+.mw-calc-actions {display:flex;align-items:center;gap:15px;flex-wrap:wrap}
+.mw-calc-actions .mw-calc-muted {max-width:470px}
+.mw-calc-panel .primary-action:disabled {opacity:.48;cursor:not-allowed;box-shadow:none}
+.mw-calc-empty {padding:32px;text-align:center;color:#8795aa;display:grid;place-items:center;gap:9px}
+.mw-calc-empty span {border-radius:15px;background:#eaf2ff;color:#3b82f6;padding:9px 16px;font-size:2rem}
+.mw-calc-empty h2 {font-size:1.15rem;color:#253249;margin:5px 0 0}
+.mw-calc-empty p {font-size:.85rem;margin:0}
+.mw-calc-metrics {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.mw-calc-metrics>div {display:flex;flex-direction:column;gap:7px;padding:15px;border-radius:13px;background:#f6f8fc;border:1px solid #edf1f7;min-width:0}
+.mw-calc-metrics span {font-size:.72rem;color:#718099}
+.mw-calc-metrics strong {font-weight:800;font-size:1.6rem;color:#223147;font-variant-numeric:tabular-nums}
+.mw-calc-chip {padding:7px 11px;border-radius:100px;font-size:.7rem;font-weight:800}
+.mw-calc-chip.is-good {background:#e9faef;color:#167647}
+.mw-calc-chip.is-warning {background:#fff4e6;color:#b86b1c}
+.mw-calc-alert {margin:0;padding:12px 15px;background:#fff8eb;border:1px solid #f1ddb5;border-radius:11px;color:#8b641f;font-size:.79rem;line-height:1.6}
+.mw-calc-alert.is-danger {background:#fff1f2;border-color:#f4bec6;color:#a52a43}
+.mw-calc-table-wrap {width:100%;max-width:100%;overflow-x:auto;border:1px solid #e5eaf2;border-radius:12px}
+.mw-calc-table-wrap table {width:100%;border-collapse:collapse;min-width:420px;font-size:.78rem}
+.mw-calc-table-wrap th {background:#f7f9fc;color:#7b8798;font-size:.72rem;text-align:left}
+.mw-calc-table-wrap td,.mw-calc-table-wrap th {padding:10px 13px;border-bottom:1px solid #edf1f5}
+.mw-calc-table-wrap tbody tr:last-child td {border:0}
+.mw-calc-preview {max-height:360px;overflow-y:auto}
+@media(max-width:900px){.mw-calc-metrics {grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){.mw-calc-panel{padding:16px}.mw-calc-uploads{grid-template-columns:1fr}.mw-calc-metrics strong{font-size:1.35rem}}

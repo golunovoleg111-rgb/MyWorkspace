@@ -53,6 +53,7 @@
           <button class="nav-item" data-view="store"><svg class="nav-icon"><use href="#icon-store-analysis"/></svg><span>Анализ магазина</span></button>
           <button class="nav-item" data-view="history"><svg class="nav-icon"><use href="#icon-history"/></svg><span>История анализов</span></button>
           <button class="nav-item" data-view="stock"><svg class="nav-icon"><use href="#icon-stock"/></svg><span>Контроль остатков</span></button>
+          <button class="nav-item" data-view="calculator"><svg class="nav-icon"><use href="#icon-table"/></svg><span>Калькулятор остатков</span></button>
           <span class="nav-group-label">УПРАВЛЕНИЕ</span>
           <button class="nav-item" data-view="calendar"><svg class="nav-icon"><use href="#icon-calendar"/></svg><span>Календарь</span><span class="nav-count" id="calendarCount">0</span></button>
           <button class="nav-item" data-view="finance"><svg class="nav-icon"><use href="#icon-finance"/></svg><span>Финансы товара</span></button>
@@ -83,7 +84,7 @@
             <button class="primary-action" data-go="analytics"><span>＋</span> Создать аналитику</button>
           </div>
 
-          <div class="section-label"><h2>Быстрый доступ</h2><span>5 рабочих инструментов</span></div>
+          <div class="section-label"><h2>Быстрый доступ</h2><span>6 рабочих инструментов</span></div>
           <div class="quick-grid" data-tour="quick-access">
             <a class="tool-card tool-blue" href="https://golunovoleg111-rgb.github.io/FBS-CONVERTER/" target="_blank" rel="noreferrer">
               <div class="tool-top"><span class="tool-symbol"><svg><use href="#icon-convert"/></svg></span><span class="external"><svg><use href="#icon-external"/></svg></span></div>
@@ -109,6 +110,11 @@
               <div class="tool-top"><span class="tool-symbol"><svg><use href="#icon-store-analysis"/></svg></span><span class="external"><svg><use href="#icon-arrow"/></svg></span></div>
               <div><span class="tool-kicker">АНАЛИТИКА WB</span><h3>Анализ магазина</h3><p>Причины роста и снижения заказов по каждому товару</p></div>
               <span class="open-link">Загрузить отчёты <svg><use href="#icon-arrow"/></svg></span>
+            </button>
+            <button class="tool-card tool-cyan" data-go="calculator">
+              <div class="tool-top"><span class="tool-symbol"><svg><use href="#icon-stock"/></svg></span><span class="external"><svg><use href="#icon-arrow"/></svg></span></div>
+              <div><span class="tool-kicker">ОБРАБОТКА ОСТАТКОВ</span><h3>Калькулятор остатков</h3><p>Вычет активных заказов New и выгрузка Excel по баркодам</p></div>
+              <span class="open-link">Рассчитать остатки <svg><use href="#icon-arrow"/></svg></span>
             </button>
           </div>
 
@@ -281,6 +287,57 @@
         <section class="view" id="view-stock">
           <div class="page-heading compact-heading module-heading"><div><p class="eyebrow">ДОСТУПНОСТЬ ТОВАРОВ</p><h1>Контроль остатков</h1><p>Нулевые размеры, критический запас и избыточные остатки по последнему анализу.</p></div><button class="ghost-button" id="exportStock">Выгрузить CSV</button></div>
           <div id="stockWorkspace"></div>
+        </section>
+
+        <section class="view" id="view-calculator">
+          <div class="page-heading compact-heading module-heading">
+            <div><p class="eyebrow">ОФИС · ОБРАБОТКА EXCEL</p><h1>Калькулятор остатков</h1>
+              <p>Вычтите активные заказы New из текущих остатков склада или офиса. Итоговый файл: Баркод / Количество.</p>
+            </div>
+          </div>
+          <div class="mw-calc-layout">
+            <section class="mw-calc-panel">
+              <div class="mw-calc-section-head"><h2>1. Загрузите отчёты</h2><span>Файлы XLSX</span></div>
+              <div class="mw-calc-uploads">
+                <label class="mw-calc-upload">
+                  <span class="mw-calc-upload-index">01</span>
+                  <strong>Остатки</strong>
+                  <small>Первый файл · Баркод и Количество</small>
+                  <span class="mw-calc-input-label" id="calcName-stock">Выбрать файл XLSX</span>
+                  <input type="file" id="calculatorStockFile" accept=".xlsx" aria-label="Файл остатков" />
+                </label>
+                <label class="mw-calc-upload">
+                  <span class="mw-calc-upload-index">02</span>
+                  <strong>Активные заказы New</strong>
+                  <small>Второй файл · Артикул продавца и Размер</small>
+                  <span class="mw-calc-input-label" id="calcName-orders">Выбрать файл XLSX</span>
+                  <input type="file" id="calculatorOrdersFile" accept=".xlsx" aria-label="Файл активных заказов" />
+                </label>
+              </div>
+              <details class="mw-calc-reference">
+                <summary>Справочник баркодов (загрузить один раз)</summary>
+                <p class="mw-calc-muted">В файле New баркоды часто пустые. Загрузите справочник с колонками «Артикул продавца», «Размер», «Баркод». Он сохранится только в этом браузере, и в следующий раз хватит двух файлов.</p>
+                <div class="mw-calc-reference-row">
+                  <label class="mw-calc-upload mw-calc-upload-small">
+                    <strong>Номенклатура</strong>
+                    <small>Артикул / Размер / Баркод</small>
+                    <span class="mw-calc-input-label" id="calcName-catalog">Выбрать файл XLSX</span>
+                    <input type="file" id="calculatorCatalogFile" accept=".xlsx" aria-label="Справочник номенклатуры" />
+                  </label>
+                  <button class="ghost-button" type="button" id="clearStockCatalog">Очистить справочник</button>
+                </div>
+                <p id="calculatorCatalogStatus" class="mw-calc-muted">Справочник ещё не загружен.</p>
+              </details>
+              <div class="mw-calc-actions">
+                <button type="button" class="primary-action" id="calculateStock" disabled>Рассчитать остатки</button>
+                <span class="mw-calc-muted">Все файлы обрабатываются на этом устройстве; складская база не изменяется.</span>
+              </div>
+            </section>
+            <section class="mw-calc-panel" id="calculatorResult" aria-live="polite">
+              <div class="mw-calc-empty"><span>∑</span><h2>Здесь появится результат</h2>
+              <p>Загрузите два отчёта, затем нажмите «Рассчитать остатки».</p></div>
+            </section>
+          </div>
         </section>
 
         <section class="view" id="view-calendar">

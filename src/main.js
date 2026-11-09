@@ -1,5 +1,6 @@
 import './styles.css';
 import './rest-zone.css';
+import { renderStockCalculator } from './stock-calculator.js';
 import { exportAnalyticsDocx } from './docx-export.js';
 import { initStoreAnalysis } from './store-ui.js';
 import { initWorkspaceModules, renderWorkspaceModule } from './workspace-modules.js';
@@ -7,7 +8,7 @@ import { initPetCompanion } from './pet.js';
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
-const sections = { home: 'Главная', files: 'Мои файлы', products: 'Карточки товаров', analytics: 'Аналитика', store: 'Анализ магазина', history: 'История анализов', stock: 'Контроль остатков', calendar: 'Календарь', finance: 'Финансы товара', knowledge: 'База знаний', fbs: 'FBS · Таблицы', rest: 'Дом питомцев' };
+const sections = { home: 'Главная', files: 'Мои файлы', products: 'Карточки товаров', analytics: 'Аналитика', store: 'Анализ магазина', history: 'История анализов', stock: 'Контроль остатков', calculator: 'Калькулятор остатков', calendar: 'Календарь', finance: 'Финансы товара', knowledge: 'База знаний', fbs: 'FBS · Таблицы', rest: 'Дом питомцев' };
 const keys = { files: 'myworkspace.files.v1', draft: 'myworkspace.analytics.v1', profile: 'myworkspace.profile.v1', tour: 'myworkspace.tour.v1' };
 let files = load(keys.files, []);
 let activeFileId = null;
@@ -136,6 +137,7 @@ function switchView(name) {
   $('#sidebar').classList.remove('is-open');
   if (name === 'files') renderFiles();
   renderWorkspaceModule(name);
+  if (name === 'calculator') renderStockCalculator();
   document.dispatchEvent(new CustomEvent('myworkspace:view-change', { detail: { name } }));
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }

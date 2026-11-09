@@ -1,0 +1,37 @@
+.stockcalc-page{display:grid;gap:20px;max-width:1230px;margin:0 auto;padding-bottom:50px}
+.stockcalc-page .page-heading{margin-bottom:0}
+.stockcalc-panel{background:#fff;border:1px solid #e1e6f0;border-radius:17px;box-shadow:0 9px 27px rgba(18,35,66,.035);padding:24px;display:grid;gap:17px;min-width:0}
+.stockcalc-panel h2{font-size:18px;margin:0;color:#192437}
+.stockcalc-panel h3{font-size:14px;margin:0;color:#273449}
+.stockcalc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.stockcalc-upload{min-width:0;display:flex;flex-direction:column;gap:8px;padding:20px;border:1px dashed #adc0e1;border-radius:13px;background:#f8faff;cursor:pointer;transition:.15s}
+.stockcalc-upload:hover,.stockcalc-upload:focus-within{border-color:#2563eb;background:#f0f6ff}
+.stockcalc-upload b{font-size:15px;color:#17243b}
+.stockcalc-upload small,.stockcalc-hint,.stockcalc-actions small{font-size:12px;line-height:1.5;color:#77849a}
+.stockcalc-upload-icon{display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:#e8f0ff;color:#2563eb;font-size:26px}
+.stockcalc-file{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:#fff;border:1px solid #dce3ef;padding:10px 12px;border-radius:8px;color:#425575}
+.stockcalc-upload input{position:absolute;opacity:0;width:1px;height:1px}
+.stockcalc-details{border-top:1px solid #edf0f5;padding-top:14px}
+.stockcalc-details summary{font-size:13px;font-weight:700;color:#24334d;cursor:pointer}
+.stockcalc-details p{font-size:12px;color:#718099;line-height:1.6}
+.stockcalc-details .stockcalc-upload{max-width:520px;margin:12px 0}
+.stockcalc-link{border:0;background:transparent;color:#2563eb;padding:4px 0;cursor:pointer;font-size:12px;font-weight:700}
+.stockcalc-actions{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.stockcalc-actions .primary-action:disabled{opacity:.45;cursor:not-allowed}
+.stockcalc-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.stockcalc-metric{background:#f6f8fc;border:1px solid #e6eaf2;border-radius:11px;padding:16px 14px}
+.stockcalc-metric small{display:block;color:#7b879d;font-size:11px;margin-bottom:7px}
+.stockcalc-metric strong{font-size:26px;font-weight:800;color:#1c2b44;font-variant-numeric:tabular-nums}
+.stockcalc-result-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.stockcalc-ok,.stockcalc-bad{padding:7px 12px;border-radius:100px;font-size:11px;font-weight:700}
+.stockcalc-ok{color:#138653;background:#e6f8f0}.stockcalc-bad{color:#a65c10;background:#fff2e2}
+.stockcalc-info,.stockcalc-warn{padding:12px 14px;margin:0;border-radius:9px;font-size:12px;line-height:1.55}
+.stockcalc-info{background:#f0f6ff;color:#285eaa}.stockcalc-warn{background:#fff1eb;color:#a84224}
+.stockcalc-hint{margin:0}
+.stockcalc-scroll{overflow:auto;max-width:100%;border:1px solid #e4eaf3;border-radius:10px}
+.stockcalc-scroll table{border-collapse:collapse;width:100%;min-width:420px;font-size:12px}
+.stockcalc-scroll th,.stockcalc-scroll td{padding:10px 13px;border-bottom:1px solid #eef1f6;text-align:left}
+.stockcalc-scroll th{background:#f8faff;color:#758298;font-weight:700}
+.stockcalc-scroll tr:last-child td{border-bottom:0}
+.stockcalc-preview{max-height:330px;overflow:auto}
+@media(max-width:800px){.stockcalc-grid{grid-template-columns:1fr}.stockcalc-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.stockcalc-panel{padding:16px}.stockcalc-metric strong{font-size:21px}}
